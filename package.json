@@ -1,0 +1,30 @@
+{
+	"name": "vite-svg-sfc",
+	"version": "1.0.0",
+	"description": "Convert SVGs to Vue single file component(SFC)",
+	"author": "Kaciras <Kaciras@outlook.com>",
+	"license": "MIT",
+	"keywords": [
+		"vite-plugin",
+		"vue",
+		"svg"
+	],
+	"types": "index.ts",
+	"main": "index.js",
+	"scripts": {
+		"test": "vitest run"
+	},
+	"dependencies": {
+		"svgo": "^2.8.0"
+	},
+	"devDependencies": {
+		"@types/node": "^17.0.17",
+		"@types/svgo": "^2.6.2",
+		"@vitejs/plugin-vue": "^2.2.0",
+		"@vue/server-renderer": "^3.2.29",
+		"typescript": "^4.5.5",
+		"vite": "^2.8.2",
+		"vitest": "^0.3.5",
+		"vue": "^3.2.31"
+	}
+}
