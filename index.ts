@@ -76,9 +76,18 @@ export interface VueSVGOptions {
 	plugins?: Plugin[] | PluginConfig;
 }
 
+function parseId(id: string) {
+	const [file, query] = id.split("?", 2);
+	return {
+		file, query,
+		params: new URLSearchParams(query),
+	};
+}
 
 export default function (optoins?: VueSVGOptions): VitePlugin {
 	let minify: boolean;
+
+	const fileIdMap = new Map<string, string>();
 
 	return {
 		name: "kaciras:vue-svg-component",
@@ -90,16 +99,38 @@ export default function (optoins?: VueSVGOptions): VitePlugin {
 			minify = config.mode === "production";
 		},
 
+		handleHotUpdate(ctx) {
+			const { file, server } = ctx;
+			const id = fileIdMap.get(file);
+			if (!id) {
+				return;
+			}
+			const mod = server.moduleGraph.getModulesByFile(id);
+			return mod ? [...mod] : undefined;
+		},
 
 		async resolveId(id: string, importer: string) {
-			const match = /\.svg(?:\.vue)?\?sfc$/.exec(id);
-			if (!match) {
+			if (id.startsWith("/@")) {
 				return null;
 			}
-			id = id.slice(0, match.index + 4);
+			const { file, query, params } = parseId(id);
+			let suffix: string;
+
+			if (file.endsWith(".svg") && params.has("sfc")) {
+				suffix = ".vue?sfc";
+				id = file;
+			} else if (file.endsWith(".svg.vue") && (params.has("sfc") || params.has("vue"))) {
+				id = file.slice(0, -4);
+				suffix = ".vue?" + query;
+			} else {
+				return null;
+			}
+
 			const r = await this.resolve(id, importer, { skipSelf: true });
 			if (r) {
-				return r.id + ".vue?sfc";
+				const cc = r.id + suffix;
+				fileIdMap.set(r.id, r.id + ".vue");
+				return cc;
 			}
 			throw new Error("Cannot resolve file: " + id);
 		},
@@ -110,7 +141,6 @@ export default function (optoins?: VueSVGOptions): VitePlugin {
 			}
 			return readFileSync(id.slice(0, -8), "utf8");
 		},
-
 
 		transform(code, id) {
 			if (!id.endsWith(".svg.vue?sfc")) {
