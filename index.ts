@@ -3,7 +3,7 @@ import { Plugin as VitePlugin } from "vite";
 import { optimize, Plugin } from "svgo";
 
 
-const reactiveColorPlugin: Plugin = {
+const responsivePlugin: Plugin = {
 	name: "reactiveSVGAttribute",
 	type: "perItem",
 	fn(ast) {
@@ -23,8 +23,7 @@ const reactiveColorPlugin: Plugin = {
 	},
 };
 
-
-function extractStyles(styles: string[]): any {
+function extractCSSPlugin(styles: string[]) {
 
 	function enter(node: any, parent: any) {
 		if (node.name !== "style") {
@@ -37,14 +36,22 @@ function extractStyles(styles: string[]): any {
 			.filter((c: unknown) => c !== node);
 	}
 
-	return {
-		name: "collectStyles",
+	// @types/svgo not include the new "visitor" type.
+	return <any>{
+		name: "extractCSS",
 		type: "visitor",
 		fn: () => ({ element: { enter } }),
 	};
 }
 
-export const minifyPreset: Plugin = {
+// Ensure SVG has only one root node.
+const essential: Plugin[] = [
+	{ name: "removeComments" },
+	{ name: "removeDoctype" },
+	{ name: "removeXMLProcInst" },
+];
+
+const minifyPreset: Plugin = {
 	name: "preset-default",
 	params: {
 		overrides: {
@@ -53,27 +60,14 @@ export const minifyPreset: Plugin = {
 	},
 };
 
-
-const developmentPlugins: Plugin[] = [
-	reactiveColorPlugin,
-	{ name: "removeComments" },
-	{ name: "removeDoctype" },
-	{ name: "removeXMLProcInst" },
-];
-
-const productionPlugins: Plugin[] = [
-	reactiveColorPlugin,
-	minifyPreset,
-];
-
 export interface PluginConfig {
-	reactive?: boolean;
 	minify?: boolean;
-	extractStyle?: boolean;
+	responsive?: boolean;
 }
 
 export interface VueSVGOptions {
-	plugins?: Plugin[] | PluginConfig;
+	extractStyles?: boolean;
+	svgo?: Plugin[] | PluginConfig;
 }
 
 function parseId(id: string) {
@@ -84,15 +78,30 @@ function parseId(id: string) {
 	};
 }
 
-export default function (optoins?: VueSVGOptions): VitePlugin {
-	let minify: boolean;
+export default function (options: VueSVGOptions = {}): VitePlugin {
+	const { svgo = {}, extractStyles = true } = options;
+	let isProd: boolean;
 
 	function svg2sfc(code: string) {
 		const styles: string[] = [];
-		const plugins = [
-			...(minify ? productionPlugins : developmentPlugins),
-			extractStyles(styles),
-		];
+		let plugins = svgo;
+
+		if (!Array.isArray(plugins)) {
+			const { responsive = true, minify } = plugins;
+			plugins = [];
+
+			if (responsive) {
+				plugins.push(responsivePlugin);
+			}
+			if (minify ?? isProd) {
+				plugins.push(minifyPreset);
+			} else {
+				plugins.push(...essential);
+			}
+		}
+		if (extractStyles) {
+			plugins.push(extractCSSPlugin(styles));
+		}
 
 		const result = optimize(code, { plugins });
 		if (result.modernError) {
