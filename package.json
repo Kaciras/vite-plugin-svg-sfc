@@ -9,6 +9,7 @@
 		"vue",
 		"svg"
 	],
+	"type": "module",
 	"types": "index.ts",
 	"main": "index.js",
 	"scripts": {
@@ -20,8 +21,10 @@
 	"devDependencies": {
 		"@kaciras/eslint-config-core": "^2.3.0",
 		"@kaciras/eslint-config-typescript": "^2.3.0",
+		"@kaciras/eslint-config-vue": "^2.3.0",
 		"@types/node": "^17.0.17",
 		"@types/svgo": "^2.6.2",
+		"@types/ws": "^8.2.2",
 		"@vitejs/plugin-vue": "^2.2.0",
 		"@vue/server-renderer": "^3.2.29",
 		"eslint": "^8.9.0",

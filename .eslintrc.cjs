@@ -3,6 +3,7 @@ module.exports = {
 	extends: [
 		"@kaciras/core",
 		"@kaciras/typescript",
+		"@kaciras/vue/typescript",
 	],
 	env: { node: true },
 };
