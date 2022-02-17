@@ -2,9 +2,8 @@ import { readFileSync } from "fs";
 import { Plugin as VitePlugin } from "vite";
 import { optimize, Plugin } from "svgo";
 
-
-const responsivePlugin: Plugin = {
-	name: "reactiveSVGAttribute",
+export const responsivePlugin: Plugin = {
+	name: "responsiveSVGAttribute",
 	type: "perItem",
 	fn(ast) {
 		const { type, name, attributes } = ast;
@@ -23,6 +22,11 @@ const responsivePlugin: Plugin = {
 	},
 };
 
+/**
+ * Remove all <style> elements and collect their content。
+ *
+ * @param styles store <style>'s content.
+ */
 function extractCSSPlugin(styles: string[]) {
 
 	function enter(node: any, parent: any) {
@@ -44,7 +48,7 @@ function extractCSSPlugin(styles: string[]) {
 	};
 }
 
-// Ensure SVG has only one root node.
+// Ensure the SVG has only one root node.
 const essential: Plugin[] = [
 	{ name: "removeComments" },
 	{ name: "removeDoctype" },
@@ -60,14 +64,43 @@ const minifyPreset: Plugin = {
 	},
 };
 
-export interface PluginConfig {
+export interface PluginOptions {
+
+	/**
+	 * Perform minification for svg.
+	 *
+	 * @default true on production mode and false otherwise.
+	 */
 	minify?: boolean;
+
+	/**
+	 * When set to true, some attributes on <svg> will be replaced with reactive value:
+	 * 1）set width & height to "1em".
+	 * 2）set fill and stroke to "currentColor" if it's not transparent。
+	 *
+	 * @default true
+	 */
 	responsive?: boolean;
 }
 
 export interface VueSVGOptions {
+
+	/**
+	 * When set to true, extract all style elements in the svg and put
+	 * their content into a scoped SFC style block.
+	 *
+	 * Note that Vue compiler will throw error if the template contains <style>.
+	 *
+	 * @default true
+	 */
 	extractStyles?: boolean;
-	svgo?: Plugin[] | PluginConfig;
+
+	/**
+	 * Configure default SVGO plugin preset, or specify the plugins to use.
+	 *
+	 * @default {}, see PluginOptions
+	 */
+	svgo?: PluginOptions | Plugin[];
 }
 
 function parseId(id: string) {
@@ -78,6 +111,9 @@ function parseId(id: string) {
 	};
 }
 
+/**
+ * Convert SVG to Vue SFC, you may need another plugin to process the .vue file。
+ */
 export default function (options: VueSVGOptions = {}): VitePlugin {
 	const { svgo = {}, extractStyles = true } = options;
 	let isProd: boolean;
@@ -120,7 +156,7 @@ export default function (options: VueSVGOptions = {}): VitePlugin {
 	return {
 		name: "kaciras:vue-svg-component",
 
-		// 本插件必须在 vite:asset 以及其它处理 .vue 文件的插件之前执行。
+		// This plugin must run before vite:asset and other plugins that process .vue files.
 		enforce: "pre",
 
 		configResolved(config) {
@@ -144,6 +180,14 @@ export default function (options: VueSVGOptions = {}): VitePlugin {
 			}
 		},
 
+		/**
+		 * Resolve "*.svg?sfc" import to a virtual .vue file.
+		 * e.g. "./image.svg?sfc" -> "/path/to/image.svg.vue?sfc"
+		 *
+		 * About the suffix:
+		 * The `.vue` extension allows other plugins to treat it as a vue file.
+		 * Keep the `?sfc` query to prevent vite:scan-deps to process it.
+		 */
 		async resolveId(id: string, importer: string) {
 			if (id.startsWith("/@")) {
 				return null;
