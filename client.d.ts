@@ -1,8 +1,5 @@
 declare module "*.svg?sfc" {
-	import { DefineComponent } from "vue";
-
-	// eslint-disable-next-line @typescript-eslint/ban-types
-	const component: DefineComponent<{}, {}, any>;
-
+	import { DefineComponent, SVGAttributes } from "vue";
+	const component: DefineComponent<SVGAttributes>;
 	export default component;
 }
