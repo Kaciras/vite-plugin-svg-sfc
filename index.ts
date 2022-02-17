@@ -139,21 +139,13 @@ export default function (optoins?: VueSVGOptions): VitePlugin {
 			if (!id.endsWith(".svg.vue?sfc")) {
 				return null;
 			}
-			return readFileSync(id.slice(0, -8), "utf8");
-		},
-
-		transform(code, id) {
-			if (!id.endsWith(".svg.vue?sfc")) {
-				return null;
-			}
-			this.addWatchFile(id.slice(0, -8));
-
 			const styles: string[] = [];
 			const plugins = [
 				...(minify ? productionPlugins : developmentPlugins),
 				extractStyles(styles),
 			];
 
+			let code = readFileSync(id.slice(0, -8), "utf8");
 			const result = optimize(code, { plugins });
 			if (result.modernError) {
 				throw result.modernError;
