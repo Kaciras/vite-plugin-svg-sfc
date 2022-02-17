@@ -146,13 +146,13 @@ export default function (options: VueSVGOptions = {}): VitePlugin {
 	}
 
 	return {
-		name: "kaciras:vue-svg-component",
+		name: "vite-plugin-svg-sfc",
 
 		// This plugin must run before vite:asset and other plugins that process .vue files.
 		enforce: "pre",
 
 		configResolved(config) {
-			minify = config.mode === "production";
+			isProd = config.mode === "production";
 		},
 
 		/**

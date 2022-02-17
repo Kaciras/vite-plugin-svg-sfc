@@ -17,5 +17,5 @@ node_modules
 *.sln
 
 # Generated files
+*.js
 *.js.map
-/index.js
