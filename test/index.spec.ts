@@ -1,43 +1,35 @@
 import { createRequire } from "module";
-import { basename } from "path";
 import vm from "vm";
 import { expect, it } from "vitest";
-import { Plugin } from "vite";
 import vue from "@vitejs/plugin-vue";
-import { getAsset, runVite } from "./test-utils";
+import { extractSFCPlugin, getAsset, resolveFixture } from "./test-utils";
 import vueSvgComponent from "../index";
 import { createApp } from "vue";
 import { renderToString } from "@vue/server-renderer";
+import { build } from "vite";
+import { RollupOutput } from "rollup";
 
-
-const extractCodePlugin: Plugin = {
-	name: "test:extract-code",
-	transform(code: string, id: string) {
-		if (!id.endsWith(".svg.vue?sfc")) {
-			return;
-		}
-		this.emitFile({
-			type: "asset",
-			name: id,
-			fileName: basename(id, ".vue?sfc"),
-			source: code,
-		});
-		return "window.avoidWarn = 1";
-	},
-};
-
-async function convert(input: string, mode?: string) {
-	const bundle = await runVite({
+async function convert(fixture: string, mode?: string) {
+	const bundle = await build({
+		logLevel: "silent",
 		mode,
 		build: {
-			rollupOptions: { input },
+			write: false,
+			rollupOptions: {
+				input: resolveFixture(fixture),
+				output: {
+					entryFileNames: "[name].js",
+					chunkFileNames: "[name].js",
+					assetFileNames: "[name].[ext]",
+				},
+			},
 		},
 		plugins: [
 			vueSvgComponent(),
-			extractCodePlugin,
+			extractSFCPlugin,
 		],
 	});
-	return getAsset(bundle, input);
+	return getAsset(bundle as RollupOutput, fixture);
 }
 
 function loadBundle<T = any>(code: string) {
@@ -53,7 +45,7 @@ it("should throw on non-SVG data", async () => {
 });
 
 it("should change attributes in %s", async () => {
-	expect(await convert("visible-off.svg?sfc")).toMatchSnapshot();
+	expect(await convert("styles-0.svg?sfc")).toMatchSnapshot();
 });
 
 it("should change stroke", async () => {
@@ -65,24 +57,25 @@ it("should remove processing instruction in %s", async () => {
 });
 
 it("should extract styles", async () => {
-	const source = await convert("inline-styles.svg?sfc");
+	const source = await convert("styles-0.svg?sfc");
 	expect(source.toString()).toMatchSnapshot();
 });
 
-
 it("should work with @vitejs/plugin-vue", async () => {
-	const bundle = await runVite(
-		{
-			build: {
-				ssr: "inline-styles.svg?sfc",
-			},
-			plugins: [
-				vue(),
-				vueSvgComponent(),
-			],
+	const bundle = await build({
+		logLevel: "silent",
+		build: {
+			write: false,
+			ssr: resolveFixture("styles-0.svg?sfc"),
 		},
-	);
-	const component = loadBundle(bundle.output[0].code).default;
+		plugins: [
+			vue(),
+			vueSvgComponent(),
+		],
+	});
+	const { code } = (bundle as RollupOutput).output[0];
+
+	const component = loadBundle(code).default;
 	const app = createApp(component, { width: 4396 });
 	expect(await renderToString(app)).toMatchSnapshot();
 });
