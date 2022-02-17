@@ -17,6 +17,6 @@ jobs:
 
       - run: pnpm install
 
-      - run: pnpm run compile
-
       - run: pnpm test -- --coverage
+
+      - uses: codecov/codecov-action@v2
