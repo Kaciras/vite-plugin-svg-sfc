@@ -1,0 +1,38 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Use Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 17
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - run: npm i -g pnpm
+
+      - run: pnpm install
+
+      - run: pnpm run compile:ts
+
+      - name: Build Example
+        run: pnpm run build
+        working-directory: example
+
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@v4.2.5
+        with:
+          folder: example/dist
+          silent: true
+          clean: true
+          branch: gh-pages
+          single-commit: true

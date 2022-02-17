@@ -13,6 +13,7 @@
 	"types": "index.ts",
 	"main": "index.js",
 	"scripts": {
+		"compile:ts": "tsc",
 		"test": "vitest run"
 	},
 	"dependencies": {
