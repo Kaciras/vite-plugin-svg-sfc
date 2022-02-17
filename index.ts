@@ -103,14 +103,6 @@ export interface VueSVGOptions {
 	svgo?: PluginOptions | Plugin[];
 }
 
-function parseId(id: string) {
-	const [file, query] = id.split("?", 2);
-	return {
-		file, query,
-		params: new URLSearchParams(query),
-	};
-}
-
 /**
  * Convert SVG to Vue SFC, you may need another plugin to process the .vue file。
  */
@@ -192,24 +184,26 @@ export default function (options: VueSVGOptions = {}): VitePlugin {
 			if (id.startsWith("/@")) {
 				return null;
 			}
-			const { file, query, params } = parseId(id);
 			let suffix: string;
 
-			if (file.endsWith(".svg") && params.has("sfc")) {
+			if (id.endsWith("svg?sfc")) {
+				id = id.slice(0, -4);
 				suffix = ".vue?sfc";
-				id = file;
-			} else if (file.endsWith(".svg.vue") && (params.has("sfc") || params.has("vue"))) {
-				id = file.slice(0, -4);
-				suffix = ".vue?" + query;
 			} else {
-				return null;
+				const [path, query] = id.split("?", 2);
+				if (!path.endsWith(".svg.vue")) {
+					return null;
+				}
+				id = path.slice(0, -4);
+				suffix = ".vue";
+				if (query) {
+					suffix += "?" + query;
+				}
 			}
 
 			const r = await this.resolve(id, importer, { skipSelf: true });
 			if (r) {
-				const cc = r.id + suffix;
-				fileIdMap.set(r.id, r.id + ".vue");
-				return cc;
+				return r.id + suffix;
 			}
 			throw new Error("Cannot resolve file: " + id);
 		},
