@@ -87,7 +87,26 @@ function parseId(id: string) {
 export default function (optoins?: VueSVGOptions): VitePlugin {
 	let minify: boolean;
 
-	const fileIdMap = new Map<string, string>();
+	function svg2sfc(code: string) {
+		const styles: string[] = [];
+		const plugins = [
+			...(minify ? productionPlugins : developmentPlugins),
+			extractStyles(styles),
+		];
+
+		const result = optimize(code, { plugins });
+		if (result.modernError) {
+			throw result.modernError;
+		}
+
+		code = `<template>${result.data}</template>`;
+		if (styles.length === 0) {
+			return code;
+		} else {
+			const css = styles.join("");
+			return `${code}<style scoped>${css}</style>`;
+		}
+	}
 
 	return {
 		name: "kaciras:vue-svg-component",
@@ -146,25 +165,7 @@ export default function (optoins?: VueSVGOptions): VitePlugin {
 			if (!id.endsWith(".svg.vue?sfc")) {
 				return null;
 			}
-			const styles: string[] = [];
-			const plugins = [
-				...(minify ? productionPlugins : developmentPlugins),
-				extractStyles(styles),
-			];
-
-			let code = readFileSync(id.slice(0, -8), "utf8");
-			const result = optimize(code, { plugins });
-			if (result.modernError) {
-				throw result.modernError;
-			}
-
-			code = `<template>${result.data}</template>`;
-			if (styles.length === 0) {
-				return code;
-			} else {
-				const css = styles.join("");
-				return `${code}<style scoped>${css}</style>`;
-			}
+			return svg2sfc(readFileSync(id.slice(0, -8), "utf8"));
 		},
 	};
 }
