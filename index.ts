@@ -99,14 +99,21 @@ export default function (optoins?: VueSVGOptions): VitePlugin {
 			minify = config.mode === "production";
 		},
 
+		/**
+		 * When a svg file changed, we look for corresponding SFC modules,
+		 * if present, add them to affected module list.
+		 */
 		handleHotUpdate(ctx) {
-			const { file, server } = ctx;
-			const id = fileIdMap.get(file);
-			if (!id) {
-				return;
+			const { file, server, modules } = ctx;
+
+			if (file.endsWith(".svg")) {
+				const graph = server.moduleGraph;
+				const id = file + ".vue";
+				const vMods = graph.getModulesByFile(id);
+				if (vMods) {
+					return [...modules, ...vMods];
+				}
 			}
-			const mod = server.moduleGraph.getModulesByFile(id);
-			return mod ? [...mod] : undefined;
 		},
 
 		async resolveId(id: string, importer: string) {
