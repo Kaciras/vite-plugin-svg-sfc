@@ -113,7 +113,7 @@ export default function (options: VueSVGOptions = {}): VitePlugin {
 	const { svgo = {}, extractStyles = true } = options;
 	let isProd: boolean;
 
-	function svg2sfc(code: string) {
+	function svg2sfc(code: string, filename: string) {
 		const styles: string[] = [];
 		let plugins = svgo;
 
@@ -134,7 +134,10 @@ export default function (options: VueSVGOptions = {}): VitePlugin {
 			plugins.push(extractCSSPlugin(styles));
 		}
 
-		const result = optimize(code, { plugins });
+		const result = optimize(code, {
+			plugins,
+			path: filename,
+		});
 		if (result.modernError) {
 			throw result.modernError;
 		}
@@ -219,7 +222,8 @@ export default function (options: VueSVGOptions = {}): VitePlugin {
 			if (!id.endsWith(".svg.vue?sfc")) {
 				return null;
 			}
-			return svg2sfc(readFileSync(id.slice(0, -8), "utf8"));
+			const filename = id.slice(0, -8);
+			return svg2sfc(readFileSync(filename, "utf8"), filename);
 		},
 	};
 }
