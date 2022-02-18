@@ -4,6 +4,9 @@
 	"description": "Convert SVGs to Vue single file component(SFC), support <style> tag",
 	"author": "Kaciras <Kaciras@outlook.com>",
 	"license": "MIT",
+	"repository": {
+		"url": "https://github.com/Kaciras/vite-plugin-svg-sfc"
+	},
 	"keywords": [
 		"vite-plugin",
 		"rollup-plugin",
