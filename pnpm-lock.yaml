@@ -44,7 +44,7 @@ importers:
       '@vitejs/plugin-vue': ^2.2.0
       bootstrap-icons: ^1.8.1
       vite: ^2.8.2
-      vite-svg-sfc: workspace:^
+      vite-plugin-svg-sfc: workspace:^
       vue: ^3.2.31
     dependencies:
       bootstrap-icons: 1.8.1
@@ -52,7 +52,7 @@ importers:
     devDependencies:
       '@vitejs/plugin-vue': 2.2.0_vite@2.8.2+vue@3.2.31
       vite: 2.8.2
-      vite-svg-sfc: link:..
+      vite-plugin-svg-sfc: link:..
 
 packages:
 

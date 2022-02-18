@@ -13,6 +13,10 @@
 	"type": "module",
 	"types": "index.ts",
 	"main": "index.js",
+	"files": [
+		"index.*",
+		"client.d.ts"
+	],
 	"scripts": {
 		"compile:ts": "tsc",
 		"test": "vitest run"

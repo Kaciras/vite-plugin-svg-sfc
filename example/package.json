@@ -12,7 +12,7 @@
 		"vue": "^3.2.31"
 	},
 	"devDependencies": {
-		"vite-svg-sfc": "workspace:^",
+		"vite-plugin-svg-sfc": "workspace:^",
 		"@vitejs/plugin-vue": "^2.2.0",
 		"vite": "^2.8.2"
 	}
