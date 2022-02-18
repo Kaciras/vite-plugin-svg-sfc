@@ -15,7 +15,7 @@
 	"main": "index.js",
 	"scripts": {
 		"compile:ts": "tsc",
-		"test": "vitest run --coverage"
+		"test": "vitest run"
 	},
 	"dependencies": {
 		"svgo": "^2.8.0"

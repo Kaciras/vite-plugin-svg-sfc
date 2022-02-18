@@ -1,13 +1,13 @@
 import { createRequire } from "module";
-import vm from "vm";
+import { runInNewContext } from "vm";
 import { expect, it } from "vitest";
-import vue from "@vitejs/plugin-vue";
-import { extractSFCPlugin, getAsset, resolveFixture } from "./test-utils";
-import vueSvgComponent from "../index";
-import { createApp } from "vue";
-import { renderToString } from "@vue/server-renderer";
 import { build } from "vite";
 import { RollupOutput } from "rollup";
+import vue from "@vitejs/plugin-vue";
+import { createApp } from "vue";
+import { renderToString } from "@vue/server-renderer";
+import { extractSFCPlugin, getAsset, resolveFixture } from "./test-utils";
+import svgSfc from "../index";
 
 async function convert(fixture: string, mode?: string) {
 	const bundle = await build({
@@ -24,19 +24,16 @@ async function convert(fixture: string, mode?: string) {
 				},
 			},
 		},
-		plugins: [
-			vueSvgComponent(),
-			extractSFCPlugin,
-		],
+		plugins: [svgSfc(), extractSFCPlugin],
 	});
 	return getAsset(bundle as RollupOutput, fixture);
 }
 
 function loadBundle<T = any>(code: string) {
 	const require = createRequire(import.meta.url);
-	const context = { exports: {}, require };
-	vm.runInNewContext(code, context, { filename: "test.cjs" });
-	return context.exports as T;
+	const context: any = { exports: {}, require };
+	runInNewContext(code, context);
+	return context.exports.default as T;
 }
 
 it("should throw on non-SVG data", async () => {
@@ -68,14 +65,11 @@ it("should work with @vitejs/plugin-vue", async () => {
 			write: false,
 			ssr: resolveFixture("styles-0.svg?sfc"),
 		},
-		plugins: [
-			vue(),
-			vueSvgComponent(),
-		],
+		plugins: [vue(), svgSfc()],
 	});
 	const { code } = (bundle as RollupOutput).output[0];
 
-	const component = loadBundle(code).default;
+	const component = loadBundle(code);
 	const app = createApp(component, { width: 4396 });
 	expect(await renderToString(app)).toMatchSnapshot();
 });

@@ -2,6 +2,9 @@ import { readFileSync } from "fs";
 import { Plugin as VitePlugin } from "vite";
 import { optimize, Plugin } from "svgo";
 
+/**
+ * The SVGO plugin used when `svgo.responsive` is true.
+ */
 export const responsivePlugin: Plugin = {
 	name: "responsiveSVGAttribute",
 	type: "perItem",
@@ -48,7 +51,7 @@ function extractCSSPlugin(styles: string[]) {
 	};
 }
 
-// Ensure the SVG has only one root node.
+// Ensure the SVG has single root node.
 const essential: Plugin[] = [
 	{ name: "removeComments" },
 	{ name: "removeDoctype" },
@@ -187,9 +190,13 @@ export default function (options: VueSVGOptions = {}): VitePlugin {
 			let suffix: string;
 
 			if (id.endsWith("svg?sfc")) {
+				// Original import (*.svg?sfc)
 				id = id.slice(0, -4);
 				suffix = ".vue?sfc";
 			} else {
+				// virtual .vue file (*.svg.vue?sfc)
+				// or SFC submodule (*.svg.vue?vue),
+				// resolve to absolute path and keep the query.
 				const [path, query] = id.split("?", 2);
 				if (!path.endsWith(".svg.vue")) {
 					return null;
