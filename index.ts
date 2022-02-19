@@ -58,17 +58,6 @@ const essential: Plugin[] = [
 	"removeXMLProcInst",
 ];
 
-const minifyPreset: Plugin = {
-	name: "preset-default",
-	params: {
-		overrides: {
-			// Don't remove ID, as it may be referenced from outside.
-			cleanupIDs: false,
-			removeViewBox: false,
-		},
-	},
-};
-
 export interface PluginOptions {
 
 	/**
@@ -172,16 +161,33 @@ export default function (options: VueSVGOptions = {}): VitePlugin {
 				minify = mode === "production",
 			} = preset;
 
-			if (extractStyles) {
-				plugins.push(extractCSS(styles));
-			}
+			const overrides: Record<string, boolean> =  {
+				// Don't remove ID, as it may be referenced from outside.
+				cleanupIDs: false,
+				removeViewBox: false,
+			};
+
 			if (responsive) {
 				plugins.push(responsivePlugin);
 			}
 			if (minify) {
-				plugins.push(minifyPreset);
+				plugins.push({
+					name: "preset-default",
+					params: { overrides },
+				});
 			} else {
 				plugins.push(...essential);
+			}
+
+			if (extractStyles) {
+				overrides.inlineStyles = false;
+				plugins.push(extractCSS(styles));
+			}
+
+			if (minify) {
+				// Move it after extractCSS.
+				overrides.removeUselessDefs = false;
+				plugins.push("removeUselessDefs");
 			}
 		},
 
