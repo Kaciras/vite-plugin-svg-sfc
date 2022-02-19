@@ -41,16 +41,29 @@ it("should throw on non-SVG data", async () => {
 	await expect(build).rejects.toThrow();
 });
 
-it("should change attributes in %s", async () => {
+it("should throw on non-exists file", async () => {
+	const build = convert("not exists.svg?sfc");
+	await expect(build).rejects.toThrow();
+});
+
+it("should change attributes", async () => {
 	expect(await convert("styles-0.svg?sfc")).toMatchSnapshot();
 });
 
-it("should change stroke", async () => {
+it("should change stroke attribute", async () => {
 	expect(await convert("stroke.svg?sfc")).toMatchSnapshot();
 });
 
-it("should remove processing instruction in %s", async () => {
+it("should remove processing instruction in dev", async () => {
+	expect(await convert("instruction.svg?sfc"), "development").toMatchSnapshot();
+});
+
+it("should remove processing instruction in prod", async () => {
 	expect(await convert("instruction.svg?sfc")).toMatchSnapshot();
+});
+
+it("should not minify on dev mode", async () => {
+	expect(await convert("stroke.svg?sfc", "development")).toMatchSnapshot();
 });
 
 it("should extract styles", async () => {
