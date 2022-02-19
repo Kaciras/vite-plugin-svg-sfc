@@ -1,9 +1,9 @@
 import { readFileSync } from "fs";
 import { Plugin as VitePlugin } from "vite";
-import { optimize, Plugin } from "svgo";
+import { optimize, OptimizeOptions, Plugin } from "svgo";
 
 /**
- * The SVGO plugin used when `svgo.responsive` is true.
+ * The SVGO plugin used when `preset.responsive` is true.
  */
 export const responsivePlugin: Plugin = {
 	name: "responsiveSVGAttribute",
@@ -92,57 +92,58 @@ export interface VueSVGOptions {
 	 * When set to true, extract all style elements in the svg and put
 	 * their content into a scoped SFC style block.
 	 *
-	 * Note that Vue compiler will throw error if the template contains <style>.
+	 * This feature is not available when `svgo` is false.
 	 *
 	 * @default true
 	 */
 	extractStyles?: boolean;
 
 	/**
-	 * Configure default SVGO plugin preset, or specify the plugins to use.
+	 * Configure default SVGO plugin preset.
 	 *
-	 * @default {}, see PluginOptions
+	 * This option is ignored if `svgo.plugins` is set.
+	 *
+	 * @default {}
 	 */
-	svgo?: PluginOptions | Plugin[];
+	preset?: PluginOptions;
+
+	/**
+	 * Specify SVGO config, set to false to disable processing SVG data.
+	 *
+	 * @default {}
+	 */
+	svgo?: OptimizeOptions | false;
 }
 
 /**
  * Convert SVG to Vue SFC, you may need another plugin to process the .vue file。
  */
 export default function (options: VueSVGOptions = {}): VitePlugin {
-	const { svgo = {}, extractStyles = true } = options;
-	let isProd: boolean;
+	const { svgo = {}, preset = {}, extractStyles = true } = options;
+
+	let basePlugins: Plugin[];
 
 	function svg2sfc(code: string, filename: string) {
 		const styles: string[] = [];
-		let plugins = svgo;
 
-		if (!Array.isArray(plugins)) {
-			const { responsive = true, minify } = plugins;
-			plugins = [];
+		if (svgo) {
+			const config = Object.assign({}, svgo);
+			config.path = filename;
+			config.plugins = [...basePlugins];
 
-			if (responsive) {
-				plugins.push(responsivePlugin);
+			if (extractStyles) {
+				config.plugins.push(extractCSSPlugin(styles));
 			}
-			if (minify ?? isProd) {
-				plugins.push(minifyPreset);
+
+			const result = optimize(code, config);
+			if (!result.modernError) {
+				code = result.data;
 			} else {
-				plugins.push(...essential);
+				throw result.modernError;
 			}
 		}
-		if (extractStyles) {
-			plugins.push(extractCSSPlugin(styles));
-		}
 
-		const result = optimize(code, {
-			plugins,
-			path: filename,
-		});
-		if (result.modernError) {
-			throw result.modernError;
-		}
-
-		code = `<template>${result.data}</template>`;
+		code = `<template>${code}</template>`;
 		if (styles.length === 0) {
 			return code;
 		} else {
@@ -157,8 +158,25 @@ export default function (options: VueSVGOptions = {}): VitePlugin {
 		// This plugin must run before vite:asset and other plugins that process .vue files.
 		enforce: "pre",
 
-		configResolved(config) {
-			isProd = config.mode === "production";
+		configResolved({ mode }) {
+			if (svgo && svgo.plugins) {
+				basePlugins = svgo.plugins;
+				return;
+			}
+			const {
+				responsive = true,
+				minify = mode === "production",
+			} = preset;
+
+			basePlugins = [];
+			if (responsive) {
+				basePlugins.push(responsivePlugin);
+			}
+			if (minify) {
+				basePlugins.push(minifyPreset);
+			} else {
+				basePlugins.push(...essential);
+			}
 		},
 
 		/**
