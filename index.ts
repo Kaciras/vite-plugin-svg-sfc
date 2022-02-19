@@ -53,15 +53,17 @@ function extractCSS(styles: string[]) {
 
 // Ensure the SVG has single root node.
 const essential: Plugin[] = [
-	{ name: "removeComments" },
-	{ name: "removeDoctype" },
-	{ name: "removeXMLProcInst" },
+	"removeComments",
+	"removeDoctype",
+	"removeXMLProcInst",
 ];
 
 const minifyPreset: Plugin = {
 	name: "preset-default",
 	params: {
 		overrides: {
+			// Don't remove ID, as it may be referenced from outside.
+			cleanupIDs: false,
 			removeViewBox: false,
 		},
 	},
