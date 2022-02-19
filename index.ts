@@ -30,7 +30,7 @@ export const responsivePlugin: Plugin = {
  *
  * @param styles store <style>'s content.
  */
-function extractCSSPlugin(styles: string[]) {
+function extractCSS(styles: string[]) {
 
 	function enter(node: any, parent: any) {
 		if (node.name !== "style") {
@@ -123,17 +123,18 @@ export default function (options: VueSVGOptions = {}): VitePlugin {
 
 	let basePlugins: Plugin[];
 
-	function svg2sfc(code: string, filename: string) {
+	function svg2sfc(code: string, path: string) {
 		const styles: string[] = [];
 
 		if (svgo) {
 			const config = Object.assign({}, svgo);
-			config.path = filename;
-			config.plugins = [...basePlugins];
+			config.path = path;
+			config.plugins = [];
 
 			if (extractStyles) {
-				config.plugins.push(extractCSSPlugin(styles));
+				config.plugins.push(extractCSS(styles));
 			}
+			config.plugins.push(...basePlugins);
 
 			const result = optimize(code, config);
 			if (!result.modernError) {
@@ -240,8 +241,8 @@ export default function (options: VueSVGOptions = {}): VitePlugin {
 			if (!id.endsWith(".svg.vue?sfc")) {
 				return null;
 			}
-			const filename = id.slice(0, -8);
-			return svg2sfc(readFileSync(filename, "utf8"), filename);
+			const path = id.slice(0, -8);
+			return svg2sfc(readFileSync(path, "utf8"), path);
 		},
 	};
 }
