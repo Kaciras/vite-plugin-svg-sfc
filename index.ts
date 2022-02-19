@@ -120,23 +120,21 @@ export interface VueSVGOptions {
  */
 export default function (options: VueSVGOptions = {}): VitePlugin {
 	const { svgo = {}, preset = {}, extractStyles = true } = options;
+	const plugins: Plugin[] = [];
 
-	let basePlugins: Plugin[];
+	// It's ok to use shared array between each module,
+	// because SVGO runs synchronously, just empty the array before optimize.
+	const styles: string[] = [];
 
 	function svg2sfc(code: string, path: string) {
-		const styles: string[] = [];
+		styles.length = 0;
 
 		if (svgo) {
-			const config = Object.assign({}, svgo);
-			config.path = path;
-			config.plugins = [];
-
-			if (extractStyles) {
-				config.plugins.push(extractCSS(styles));
-			}
-			config.plugins.push(...basePlugins);
-
-			const result = optimize(code, config);
+			const result = optimize(code, {
+				...svgo,
+				path,
+				plugins,
+			});
 			if (!result.modernError) {
 				code = result.data;
 			} else {
@@ -159,9 +157,12 @@ export default function (options: VueSVGOptions = {}): VitePlugin {
 		// This plugin must run before vite:asset and other plugins that process .vue files.
 		enforce: "pre",
 
+		/**
+		 * Determine which SVGO plugins to use.
+		 */
 		configResolved({ mode }) {
 			if (svgo && svgo.plugins) {
-				basePlugins = svgo.plugins;
+				plugins.push(...svgo.plugins);
 				return;
 			}
 			const {
@@ -169,14 +170,16 @@ export default function (options: VueSVGOptions = {}): VitePlugin {
 				minify = mode === "production",
 			} = preset;
 
-			basePlugins = [];
+			if (extractStyles) {
+				plugins.push(extractCSS(styles));
+			}
 			if (responsive) {
-				basePlugins.push(responsivePlugin);
+				plugins.push(responsivePlugin);
 			}
 			if (minify) {
-				basePlugins.push(minifyPreset);
+				plugins.push(minifyPreset);
 			} else {
-				basePlugins.push(...essential);
+				plugins.push(...essential);
 			}
 		},
 
