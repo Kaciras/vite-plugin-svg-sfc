@@ -1,5 +1,6 @@
 # vite-plugin-svg-sfc
 
+[![Npm Version](https://img.shields.io/npm/v/vite-plugin-svg-sfc)](https://www.npmjs.com/package/vite-plugin-svg-sfc)
 [![Test](https://github.com/Kaciras/vite-plugin-svg-sfc/actions/workflows/test.yml/badge.svg)](https://github.com/Kaciras/vite-plugin-svg-sfc/actions/workflows/test.yml)
 [![codecov](https://codecov.io/gh/Kaciras/vite-plugin-svg-sfc/branch/master/graph/badge.svg?token=LJ6ZXPWJWP)](https://codecov.io/gh/Kaciras/vite-plugin-svg-sfc)
 
@@ -7,7 +8,7 @@ Vite plugin to convert SVGs to Vue single file components(SFC).
 
 🚀 Features
 
-* Extract `<style>` tags from SVG to SFC scoped style block.
+* Extract `<style>` tags from SVG to scoped SFC style block.
 * Hot Module Replacement support.
 * Minification with [SVGO](https://github.com/svg/svgo).
 
@@ -49,10 +50,59 @@ import myIconXml from "../assets/my-icon.svg?raw";
 </script>
 ```
 
-## Typescript
-
 If you are using TypeScript, `vite-plugin-svg-sfc/client` can be added to `d.ts` declaration file.
 
 ```typescript
 /// <reference types="vite-plugin-svg-sfc/client" />
 ```
+
+## Options
+
+`svgSfc(SVGSFCOptions)`
+
+### `extractStyles`
+
+Type: `boolean`
+
+Default: `true`
+
+When set to true, extract all style elements in the svg and put their content into a scoped SFC style block. This feature is not available when `svgo` option is false.
+
+Vue template compiler will throw error when the template contains `<style>`, so we need to move them to top level.
+
+You may notice that SVGO has a `inlineStyles` plugin that avoid `<style>` in the SVG by move styles onto the `style` property, but some css features (e.g. media query) can not be inlined.
+
+### `svgo`
+
+Type: `OptimizeOptions | false`
+
+Default: `{}`
+
+Specify the SVGO config to use, set to false to disable processing SVG data.
+
+### `preset`
+
+Type: `PluginPresetOptions`
+
+Default: `{}`
+
+Configure default SVGO plugin preset. This option is ignored if `svgo.plugins` is set.
+
+### `minify`
+
+Type: `boolean`
+
+Default: `true` on production mode and `false` otherwise.
+
+Perform minification for SVG.
+
+### `responsive`
+
+Type: `boolean`
+
+Default: `true`
+
+When set to true, some attributes on <svg> will be replaced with reactive value:
+
+* set width & height to "1em".
+* set fill and stroke to "currentColor" if it's not transparent。
