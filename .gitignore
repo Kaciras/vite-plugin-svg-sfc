@@ -17,5 +17,5 @@ dist
 *.sln
 
 # Generated files
-*.js
-*.js.map
+/index.*
+!/index.ts

@@ -13,15 +13,22 @@
 		"vue",
 		"svg"
 	],
+	"exports": {
+		".": {
+			"import": "./index.js",
+			"require": "./index.cjs"
+		}
+	},
 	"type": "module",
-	"types": "index.ts",
-	"main": "index.js",
+	"types": "index.d.ts",
 	"files": [
-		"index.*",
+		"index.d.ts",
+		"index.cjs",
+		"index.js",
 		"client.d.ts"
 	],
 	"scripts": {
-		"compile:ts": "tsc",
+		"compile": "tsc && node scripts/build-cjs.js",
 		"test": "vitest run"
 	},
 	"dependencies": {
