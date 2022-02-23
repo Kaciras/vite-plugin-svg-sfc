@@ -68,7 +68,7 @@ When set to true, extract all style elements in the svg and put their content in
 
 Vue template compiler will throw error when the template contains `<style>`, so we need to move them to top level.
 
-You may notice that SVGO has a `inlineStyles` plugin that avoid `<style>` in the SVG by move styles onto the `style` property, but some css features (e.g. media query) can not be inlined.
+You may notice that SVGO has a `inlineStyles` plugin that avoid `<style>` in the SVG by move styles onto the `style` attribute, but some css features (e.g. media query) can not be inlined.
 
 ### `minify`
 

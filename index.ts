@@ -32,7 +32,8 @@ export const extractCSSPlugin: Plugin = {
 	name: "extractCSS",
 	type: "perItem",
 	fn() {
-		throw new Error("This plugin is a placeholder and will be replaced by vite-plugin-svg-sfc");
+		throw new Error("This plugin is a placeholder and will be replaced with `extractCSS()`, " +
+			"it cannot be used outside vite-plugin-svg-sfc.");
 	},
 };
 
@@ -103,6 +104,7 @@ export interface SVGSFCOptions {
 	 *
 	 * @example
 	 * import svgSfc, { responsivePlugin, extractCSSPlugin } from "vite-plugin-svg-sfc";
+	 *
 	 * svgSfc({
 	 *     svgo: {
 	 *         plugins: [
@@ -273,11 +275,10 @@ export default function (options: SVGSFCOptions = {}): VitePlugin {
 		},
 
 		load(id: string) {
-			if (!id.endsWith(".svg.vue?sfc")) {
-				return null;
+			if (id.endsWith(".svg.vue?sfc")) {
+				const path = id.slice(0, -8);
+				return svg2sfc(readFileSync(path, "utf8"), path);
 			}
-			const path = id.slice(0, -8);
-			return svg2sfc(readFileSync(path, "utf8"), path);
 		},
 	};
 }
