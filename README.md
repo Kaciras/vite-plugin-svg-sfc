@@ -58,8 +58,6 @@ If you are using TypeScript, `vite-plugin-svg-sfc/client` can be added to `d.ts`
 
 ## Options
 
-`svgSfc(SVGSFCOptions)`
-
 ### `extractStyles`
 
 Type: `boolean`
@@ -71,22 +69,6 @@ When set to true, extract all style elements in the svg and put their content in
 Vue template compiler will throw error when the template contains `<style>`, so we need to move them to top level.
 
 You may notice that SVGO has a `inlineStyles` plugin that avoid `<style>` in the SVG by move styles onto the `style` property, but some css features (e.g. media query) can not be inlined.
-
-### `svgo`
-
-Type: `OptimizeOptions | false`
-
-Default: `{}`
-
-Specify the SVGO config to use, set to false to disable processing SVG data.
-
-### `preset`
-
-Type: `PluginPresetOptions`
-
-Default: `{}`
-
-Configure default SVGO plugin preset. This option is ignored if `svgo.plugins` is set.
 
 ### `minify`
 
@@ -106,3 +88,27 @@ When set to true, some attributes on <svg> will be replaced with reactive value:
 
 * set width & height to "1em".
 * set fill and stroke to "currentColor" if it's not transparent。
+
+### `svgo`
+
+Type: `OptimizeOptions | false`
+
+Default: `{}`
+
+Specify the SVGO config to use, set to false to disable processing SVG data.
+
+If `svgo.plugins` is specified, the `extractStyles`, `minify`, and `responsive`options are ignored, you can enable them manually by add the corresponding plugin :
+
+```typescript
+import svgSfc, { responsivePlugin, extractCSSPlugin } from "vite-plugin-svg-sfc";
+
+svgSfc({
+    svgo: {     
+        plugins: [     
+            responsivePlugin,
+            "preset-default",
+            extractCSSPlugin,
+        ],
+    },
+});
+```

@@ -3,7 +3,7 @@ import { Plugin as VitePlugin } from "vite";
 import { optimize, OptimizeOptions, Plugin } from "svgo";
 
 /**
- * The SVGO plugin used when `preset.responsive` is true.
+ * The SVGO plugin used when `responsive` is true.
  */
 export const responsivePlugin: Plugin = {
 	name: "responsiveSVGAttribute",
@@ -22,6 +22,17 @@ export const responsivePlugin: Plugin = {
 			}
 			attributes.width = attributes.height = "1em";
 		}
+	},
+};
+
+/**
+ * The SVGO plugin used when `extractStyles` is true.
+ */
+export const extractCSSPlugin: Plugin = {
+	name: "extractCSS",
+	type: "perItem",
+	fn() {
+		throw new Error("This plugin is a placeholder and will be replaced by vite-plugin-svg-sfc");
 	},
 };
 
@@ -58,10 +69,18 @@ const essential: Plugin[] = [
 	"removeXMLProcInst",
 ];
 
-export interface PluginOptions {
+export interface SVGSFCOptions {
 
 	/**
-	 * Perform minification for svg.
+	 * When set to true, extract all style elements in the svg and put
+	 * their content into a scoped SFC style block.
+	 *
+	 * @default true
+	 */
+	extractStyles?: boolean;
+
+	/**
+	 * Perform minification for SVG.
 	 *
 	 * @default true on production mode and false otherwise.
 	 */
@@ -75,31 +94,24 @@ export interface PluginOptions {
 	 * @default true
 	 */
 	responsive?: boolean;
-}
-
-export interface VueSVGOptions {
-
-	/**
-	 * When set to true, extract all style elements in the svg and put
-	 * their content into a scoped SFC style block.
-	 *
-	 * This feature is not available when `svgo` is false.
-	 *
-	 * @default true
-	 */
-	extractStyles?: boolean;
-
-	/**
-	 * Configure default SVGO plugin preset.
-	 *
-	 * This option is ignored if `svgo.plugins` is set.
-	 *
-	 * @default {}
-	 */
-	preset?: PluginOptions;
 
 	/**
 	 * Specify SVGO config, set to false to disable processing SVG data.
+	 *
+	 * If `svgo.plugins` is specified, the `extractStyles`, `minify`, and `responsive`
+	 * options are ignored, you can enable them manually by add the corresponding plugin :
+	 *
+	 * @example
+	 * import svgSfc, { responsivePlugin, extractCSSPlugin } from "vite-plugin-svg-sfc";
+	 * svgSfc({
+	 *     svgo: {
+	 *         plugins: [
+	 *             responsivePlugin,
+	 *             "preset-default",
+	 *             extractCSSPlugin,
+	 *         ]
+	 *     }
+	 * });
 	 *
 	 * @default {}
 	 */
@@ -109,13 +121,50 @@ export interface VueSVGOptions {
 /**
  * Convert SVG to Vue SFC, you may need another plugin to process the .vue file。
  */
-export default function (options: VueSVGOptions = {}): VitePlugin {
-	const { svgo = {}, preset = {}, extractStyles = true } = options;
+export default function (options: SVGSFCOptions = {}): VitePlugin {
+	const { svgo = {} } = options;
 	const plugins: Plugin[] = [];
 
 	// It's ok to use shared array between each module,
 	// because SVGO runs synchronously, just empty the array before optimize.
 	const styles: string[] = [];
+
+	function applyDefaultPlugins(isProd: boolean) {
+		const {
+			minify = isProd,
+			extractStyles = true,
+			responsive = true,
+		} = options;
+
+		const overrides: Record<string, boolean> = {
+			// Don't remove ID, as it may be referenced from outside.
+			cleanupIDs: false,
+			removeViewBox: false,
+		};
+
+		if (responsive) {
+			plugins.push(responsivePlugin);
+		}
+		if (minify) {
+			plugins.push({
+				name: "preset-default",
+				params: { overrides },
+			});
+		} else {
+			plugins.push(...essential);
+		}
+
+		if (extractStyles) {
+			overrides.inlineStyles = false;
+			plugins.push(extractCSS(styles));
+		}
+
+		if (minify) {
+			// Move it after extractCSS.
+			overrides.removeUselessDefs = false;
+			plugins.push("removeUselessDefs");
+		}
+	}
 
 	function svg2sfc(code: string, path: string) {
 		styles.length = 0;
@@ -152,42 +201,17 @@ export default function (options: VueSVGOptions = {}): VitePlugin {
 		 * Determine which SVGO plugins to use.
 		 */
 		configResolved({ mode }) {
-			if (svgo && svgo.plugins) {
-				plugins.push(...svgo.plugins);
+			if (svgo === false) {
 				return;
 			}
-			const {
-				responsive = true,
-				minify = mode === "production",
-			} = preset;
-
-			const overrides: Record<string, boolean> =  {
-				// Don't remove ID, as it may be referenced from outside.
-				cleanupIDs: false,
-				removeViewBox: false,
-			};
-
-			if (responsive) {
-				plugins.push(responsivePlugin);
+			if (!svgo.plugins) {
+				applyDefaultPlugins(mode === "production");
+				return;
 			}
-			if (minify) {
-				plugins.push({
-					name: "preset-default",
-					params: { overrides },
-				});
-			} else {
-				plugins.push(...essential);
-			}
-
-			if (extractStyles) {
-				overrides.inlineStyles = false;
-				plugins.push(extractCSS(styles));
-			}
-
-			if (minify) {
-				// Move it after extractCSS.
-				overrides.removeUselessDefs = false;
-				plugins.push("removeUselessDefs");
+			plugins.push(...svgo.plugins);
+			const i = plugins.indexOf(extractCSSPlugin);
+			if (i >= 0) {
+				plugins[i] = extractCSS(styles);
 			}
 		},
 
