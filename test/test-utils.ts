@@ -2,8 +2,9 @@ import { basename, join } from "path";
 import { copyFileSync, mkdirSync, mkdtempSync, rmSync } from "fs";
 import { tmpdir } from "os";
 import { RollupOutput } from "rollup";
-import { Plugin } from "vite";
+import { build, Plugin } from "vite";
 import { afterEach, beforeEach, expect } from "vitest";
+import svgSfc, { SVGSFCOptions } from "../index";
 
 export const extractSFCPlugin: Plugin = {
 	name: "test:extract-sfc",
@@ -20,19 +21,32 @@ export const extractSFCPlugin: Plugin = {
 	},
 };
 
-export function useTempDirectory() {
-	const root = mkdtempSync(join(tmpdir(), "vitest-"));
-	beforeEach(() => void mkdirSync(root, { recursive: true }));
-	afterEach(() => rmSync(root, { recursive: true }));
-	return root;
+interface TestOptions {
+	mode?: string;
+	config?: SVGSFCOptions;
 }
 
-export function resolveFixture(name: string) {
-	return join(__dirname, "fixtures", name);
-}
+export async function convert(fixture: string, options: TestOptions = {}) {
+	const { mode, config } = options;
 
-export function copyFixture(name: string, dist: string) {
-	copyFileSync(resolveFixture(name), dist);
+	const bundle = await build({
+		logLevel: "silent",
+		mode,
+		build: {
+			write: false,
+			rollupOptions: {
+				input: resolveFixture(fixture),
+				output: {
+					entryFileNames: "[name].js",
+					chunkFileNames: "[name].js",
+					assetFileNames: "[name].[ext]",
+				},
+			},
+		},
+		plugins: [svgSfc(config), extractSFCPlugin],
+	});
+
+	return getAsset(bundle as RollupOutput, fixture);
 }
 
 export function getAsset(bundle: RollupOutput, name: string) {
@@ -46,4 +60,19 @@ export function getAsset(bundle: RollupOutput, name: string) {
 		return file.source;
 	}
 	return expect.fail(`${name} is exists but not an asset`);
+}
+
+export function useTempDirectory(parent = tmpdir()) {
+	const root = mkdtempSync(join(parent, "vitest-"));
+	beforeEach(() => void mkdirSync(root, { recursive: true }));
+	afterEach(() => rmSync(root, { recursive: true }));
+	return root;
+}
+
+export function resolveFixture(name: string) {
+	return join(__dirname, "fixtures", name);
+}
+
+export function copyFixture(name: string, dist: string) {
+	copyFileSync(resolveFixture(name), dist);
 }
