@@ -1,6 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="208.47" height="208.47" viewBox="0 0 208.47 208.47">
 	<defs>
-		<style>.a{fill:#68bd45;}.b{fill:#fff;}</style>
+		<style>
+			.a{fill:#68bd45;}.b{fill:#fff;}
+			.s{fill:green;}
+		</style>
+		<style>
+			@media screen and (min-width: 1000px) {
+				.a{fill:#333;}.b{fill:red;}
+			}
+		</style>
 	</defs>
 	<title>Asset 1</title>
 	<path class="a"
