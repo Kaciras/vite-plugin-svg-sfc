@@ -22,7 +22,7 @@ jobs:
 
       - run: pnpm install
 
-      - run: pnpm run compile:ts
+      - run: pnpm run compile
 
       - name: Build Example
         run: pnpm run build
