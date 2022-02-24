@@ -7,17 +7,17 @@ importers:
       '@kaciras/eslint-config-core': ^2.3.0
       '@kaciras/eslint-config-typescript': ^2.3.0
       '@kaciras/eslint-config-vue': ^2.3.0
-      '@types/node': ^17.0.18
+      '@types/node': ^17.0.21
       '@types/svgo': ^2.6.2
       '@vitejs/plugin-vue': ^2.2.2
       '@vue/server-renderer': ^3.2.29
       c8: ^7.11.0
       eslint: ^8.9.0
-      rollup: ^2.67.3
+      rollup: ^2.68.0
       svgo: ^2.8.0
       typescript: ^4.5.5
       vite: ^2.8.4
-      vitest: ^0.4.1
+      vitest: ^0.5.4
       vue: ^3.2.31
     dependencies:
       svgo: 2.8.0
@@ -25,16 +25,16 @@ importers:
       '@kaciras/eslint-config-core': 2.3.0_eslint@8.9.0
       '@kaciras/eslint-config-typescript': 2.3.0_eslint@8.9.0+typescript@4.5.5
       '@kaciras/eslint-config-vue': 2.3.0_eslint@8.9.0+typescript@4.5.5
-      '@types/node': 17.0.18
+      '@types/node': 17.0.21
       '@types/svgo': 2.6.2
       '@vitejs/plugin-vue': 2.2.2_vite@2.8.4+vue@3.2.31
       '@vue/server-renderer': 3.2.31_vue@3.2.31
       c8: 7.11.0
       eslint: 8.9.0
-      rollup: 2.67.3
+      rollup: 2.68.0
       typescript: 4.5.5
       vite: 2.8.4
-      vitest: 0.4.1_c8@7.11.0
+      vitest: 0.5.4_c8@7.11.0
       vue: 3.2.31
 
   example:
@@ -183,14 +183,14 @@ packages:
     resolution: {integrity: sha512-qcUXuemtEu+E5wZSJHNxUXeCZhAfXKQ41D+duX+VYPde7xyEVZci+/oXKJL13tnRs9lR2pr4fod59GT6/X1/yQ==}
     dev: true
 
-  /@types/node/17.0.18:
-    resolution: {integrity: sha512-eKj4f/BsN/qcculZiRSujogjvp5O/k4lOW5m35NopjZM/QwLOR075a8pJW5hD+Rtdm2DaCVPENS6KtSQnUD6BA==}
+  /@types/node/17.0.21:
+    resolution: {integrity: sha512-DBZCJbhII3r90XbQxI8Y9IjjiiOGlZ0Hr32omXIZvwwZ7p4DMMXGrKXVyPfuoBOri9XNtL0UK69jYIBIsRX3QQ==}
     dev: true
 
   /@types/svgo/2.6.2:
     resolution: {integrity: sha512-m1SqMc/EDAZ8v0BBX+NmlYytUXtvrMD2/J9LICwnMvAuJwb0GSmACU3XPvcORqE7ghEJA4Mk6NYzpwhQI/biPw==}
     dependencies:
-      '@types/node': 17.0.18
+      '@types/node': 17.0.21
     dev: true
 
   /@typescript-eslint/eslint-plugin/5.12.0_c467cf9bb49b295941e83ce479a578b7:
@@ -1510,8 +1510,8 @@ packages:
       glob: 7.2.0
     dev: true
 
-  /rollup/2.67.3:
-    resolution: {integrity: sha512-G/x1vUwbGtP6O5ZM8/sWr8+p7YfZhI18pPqMRtMYMWSbHjKZ/ajHGiM+GWNTlWyOR0EHIdT8LHU+Z4ciIZ1oBw==}
+  /rollup/2.68.0:
+    resolution: {integrity: sha512-XrMKOYK7oQcTio4wyTz466mucnd8LzkiZLozZ4Rz0zQD+HeX4nUK4B8GrTX/2EvN2/vBF/i2WnaXboPxo0JylA==}
     engines: {node: '>=10.0.0'}
     hasBin: true
     optionalDependencies:
@@ -1734,13 +1734,13 @@ packages:
       esbuild: 0.14.22
       postcss: 8.4.6
       resolve: 1.22.0
-      rollup: 2.67.3
+      rollup: 2.68.0
     optionalDependencies:
       fsevents: 2.3.2
     dev: true
 
-  /vitest/0.4.1_c8@7.11.0:
-    resolution: {integrity: sha512-zDqUYOUoyBiC0DgWw9RyQqhUktaFA+hJmrZskYrnVslSuZiuzI7SYj2GmXGwHvSx1FfdWI5lRFN9IWB7Ug5cYg==}
+  /vitest/0.5.4_c8@7.11.0:
+    resolution: {integrity: sha512-mQ6Wj5vczFybtb/kZ419gLqQRroLgqRdkVkNyC4Dz6XWDGBhBNEVP/KryLGgovEGvs9nlJBacaFXWt+6Cgdstg==}
     engines: {node: '>=14.14.0'}
     hasBin: true
     peerDependencies:
