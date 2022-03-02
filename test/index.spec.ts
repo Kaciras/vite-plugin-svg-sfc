@@ -87,3 +87,15 @@ it("should not support use extractCSSPlugin directly", () => {
 	const svgo = { plugins: [extractCSSPlugin] };
 	expect(() => optimize(strokeSVG, svgo)).toThrow();
 });
+
+it("should change <svg>'s attributes with svgProps", async () => {
+	const config = {
+		config: {
+			svgProps: {
+				":data-foo": "1",	// Add new
+				viewBox: "0 0 5 5",	// Replace
+			},
+		},
+	};
+	expect(await convert("styles-0.svg?sfc", config)).toMatchSnapshot();
+});

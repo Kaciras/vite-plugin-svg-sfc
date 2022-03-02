@@ -25,6 +25,19 @@ export const responsivePlugin: Plugin = {
 	},
 };
 
+export function svgPropsPlugin(props: Record<string, string>) {
+	return <Plugin>{
+		name: "svgProps",
+		type: "perItem",
+		fn(ast) {
+			const { type, name, attributes } = ast;
+			if (type === "element" && name === "svg") {
+				Object.assign(attributes, props);
+			}
+		},
+	};
+}
+
 /**
  * The SVGO plugin used when `extractStyles` is true.
  */
@@ -97,6 +110,13 @@ export interface SVGSFCOptions {
 	responsive?: boolean;
 
 	/**
+	 * Add props to the root SVG tag.
+	 *
+	 * @default undefined
+	 */
+	svgProps?: Record<string, string>;
+
+	/**
 	 * Specify SVGO config, set to false to disable processing SVG data.
 	 *
 	 * If `svgo.plugins` is specified, the `extractStyles`, `minify`, and `responsive`
@@ -134,6 +154,7 @@ export default function (options: SVGSFCOptions = {}): VitePlugin {
 	function applyDefaultPlugins(isProd: boolean) {
 		const {
 			minify = isProd,
+			svgProps,
 			extractStyles = true,
 			responsive = true,
 		} = options;
@@ -154,6 +175,9 @@ export default function (options: SVGSFCOptions = {}): VitePlugin {
 			});
 		} else {
 			plugins.push(...essential);
+		}
+		if (svgProps) {
+			plugins.push(svgPropsPlugin(svgProps));
 		}
 
 		if (extractStyles) {
