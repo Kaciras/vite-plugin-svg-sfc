@@ -2,6 +2,8 @@ import { readFileSync } from "fs";
 import { Plugin as VitePlugin } from "vite";
 import { optimize, OptimizeOptions, Plugin } from "svgo";
 
+type SvgProps = Record<string, string>;
+
 /**
  * The SVGO plugin used when `responsive` is true.
  */
@@ -25,7 +27,15 @@ export const responsivePlugin: Plugin = {
 	},
 };
 
-export function svgPropsPlugin(props: Record<string, string>) {
+/**
+ * The SVGO plugin for `svgProps` option.
+ *
+ * SVGO has a addAttributesToSVGElement plugin similar to this,
+ * it cannot override existing attributes.
+ *
+ * @param props The attributes to add to <svg>
+ */
+export function svgPropsPlugin(props: SvgProps) {
 	return <Plugin>{
 		name: "svgProps",
 		type: "perItem",
@@ -114,7 +124,7 @@ export interface SVGSFCOptions {
 	 *
 	 * @default undefined
 	 */
-	svgProps?: Record<string, string>;
+	svgProps?: SvgProps;
 
 	/**
 	 * Specify SVGO config, set to false to disable processing SVG data.
