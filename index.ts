@@ -236,12 +236,12 @@ export default function (options: SVGSFCOptions = {}): VitePlugin {
 		/**
 		 * Determine which SVGO plugins to use.
 		 */
-		configResolved({ mode }) {
+		configResolved({ isProduction }) {
 			if (svgo === false) {
 				return;
 			}
 			if (!svgo.plugins) {
-				applyDefaultPlugins(mode === "production");
+				applyDefaultPlugins(isProduction);
 				return;
 			}
 			plugins.push(...svgo.plugins);
