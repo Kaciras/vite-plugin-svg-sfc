@@ -7,8 +7,8 @@ type SvgProps = Record<string, string>;
 /**
  * The SVGO plugin used when `responsive` is true.
  */
-export const responsivePlugin: Plugin = {
-	name: "responsiveSVGAttribute",
+export const responsiveSVGAttrs: Plugin = {
+	name: "responsiveSVGAttrs",
 	type: "perItem",
 	fn(ast) {
 		const { type, name, attributes } = ast;
@@ -35,9 +35,9 @@ export const responsivePlugin: Plugin = {
  *
  * @param props The attributes to add to <svg>
  */
-export function svgPropsPlugin(props: SvgProps) {
-	return <Plugin>{
-		name: "svgProps",
+export function setSVGAttrs(props: SvgProps): Plugin {
+	return {
+		name: "setSVGAttrs",
 		type: "perItem",
 		fn(ast) {
 			const { type, name, attributes } = ast;
@@ -51,7 +51,7 @@ export function svgPropsPlugin(props: SvgProps) {
 /**
  * The SVGO plugin used when `extractStyles` is true.
  */
-export const extractCSSPlugin: Plugin = {
+export const extractStyles: Plugin = {
 	name: "extractCSS",
 	type: "perItem",
 	fn() {
@@ -78,8 +78,8 @@ function extractCSS(styles: string[]) {
 			.filter((c: unknown) => c !== node);
 	}
 
-	// @types/svgo not include the new "visitor" type.
-	return <any>{
+	// @types/svgo does not include the new "visitor" type.
+	return <Plugin>{
 		name: "extractCSS",
 		type: "visitor",
 		fn: () => ({ element: { enter } }),
@@ -129,18 +129,23 @@ export interface SVGSFCOptions {
 	/**
 	 * Specify SVGO config, set to false to disable processing SVG data.
 	 *
-	 * If `svgo.plugins` is specified, the `extractStyles`, `minify`, and `responsive`
-	 * options are ignored, you can enable them manually by add the corresponding plugin :
+	 * If `svgo.plugins` is specified, the `extractStyles`, `minify`,
+	 * `svgProps` and `responsive` options are ignored, you can add them manually:
 	 *
 	 * @example
-	 * import svgSfc, { responsivePlugin, extractCSSPlugin } from "vite-plugin-svg-sfc";
+	 * import svgSfc, {
+	 * 		responsiveSVGAttrs,
+	 *	 	setSVGAttrs,
+	 * 		extractStyles,
+	 * } from "vite-plugin-svg-sfc";
 	 *
 	 * svgSfc({
 	 *     svgo: {
 	 *         plugins: [
-	 *             responsivePlugin,
+	 *             responsiveSVGAttrs,
+	 *             setSVGAttrs({ foo: "bar" }),
 	 *             "preset-default",
-	 *             extractCSSPlugin,
+	 *             extractStyles,
 	 *         ]
 	 *     }
 	 * });
@@ -161,7 +166,7 @@ export default function (options: SVGSFCOptions = {}): VitePlugin {
 	// because SVGO runs synchronously, just empty the array before optimize.
 	const styles: string[] = [];
 
-	function applyDefaultPlugins(isProd: boolean) {
+	function applyPresets(isProd: boolean) {
 		const {
 			minify = isProd,
 			svgProps,
@@ -176,7 +181,7 @@ export default function (options: SVGSFCOptions = {}): VitePlugin {
 		};
 
 		if (responsive) {
-			plugins.push(responsivePlugin);
+			plugins.push(responsiveSVGAttrs);
 		}
 		if (minify) {
 			plugins.push({
@@ -187,7 +192,7 @@ export default function (options: SVGSFCOptions = {}): VitePlugin {
 			plugins.push(...essential);
 		}
 		if (svgProps) {
-			plugins.push(svgPropsPlugin(svgProps));
+			plugins.push(setSVGAttrs(svgProps));
 		}
 
 		if (extractStyles) {
@@ -240,14 +245,14 @@ export default function (options: SVGSFCOptions = {}): VitePlugin {
 			if (svgo === false) {
 				return;
 			}
-			if (!svgo.plugins) {
-				applyDefaultPlugins(isProduction);
-				return;
-			}
-			plugins.push(...svgo.plugins);
-			const i = plugins.indexOf(extractCSSPlugin);
-			if (i >= 0) {
-				plugins[i] = extractCSS(styles);
+			if (svgo.plugins) {
+				plugins.push(...svgo.plugins);
+				const i = plugins.indexOf(extractStyles);
+				if (i >= 0) {
+					plugins[i] = extractCSS(styles);
+				}
+			} else {
+				applyPresets(isProduction);
 			}
 		},
 

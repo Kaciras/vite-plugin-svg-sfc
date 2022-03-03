@@ -5,11 +5,10 @@ import { expect, it } from "vitest";
 import { build } from "vite";
 import { RollupOutput } from "rollup";
 import vue from "@vitejs/plugin-vue";
-import { optimize } from "svgo";
 import { createApp } from "vue";
 import { renderToString } from "@vue/server-renderer";
 import { convert, resolveFixture } from "./test-utils";
-import svgSfc, { extractCSSPlugin } from "../index";
+import svgSfc, { extractStyles } from "../index";
 
 const strokeSVG = readFileSync(resolveFixture("stroke.svg"), "utf8");
 
@@ -77,15 +76,10 @@ it("should work with @vitejs/plugin-vue", async () => {
 	expect(await renderToString(app)).toMatchSnapshot();
 });
 
-it("should apply extractCSSPlugin", async () => {
-	const svgo = { plugins: [extractCSSPlugin] };
+it("should apply extractCss plugin", async () => {
+	const svgo = { plugins: [extractStyles] };
 	const code = await convert("styles-0.svg?sfc", { config: { svgo } });
 	expect(code).toMatchSnapshot();
-});
-
-it("should not support use extractCSSPlugin directly", () => {
-	const svgo = { plugins: [extractCSSPlugin] };
-	expect(() => optimize(strokeSVG, svgo)).toThrow();
 });
 
 it("should change <svg>'s attributes with svgProps", async () => {
