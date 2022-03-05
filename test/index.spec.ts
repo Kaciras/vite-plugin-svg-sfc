@@ -76,7 +76,7 @@ it("should work with @vitejs/plugin-vue", async () => {
 	expect(await renderToString(app)).toMatchSnapshot();
 });
 
-it("should apply extractCss plugin", async () => {
+it("should apply extractCSS plugin", async () => {
 	const svgo = { plugins: [extractStyles] };
 	const code = await convert("styles-0.svg?sfc", { config: { svgo } });
 	expect(code).toMatchSnapshot();

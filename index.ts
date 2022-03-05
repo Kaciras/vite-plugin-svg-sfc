@@ -49,7 +49,7 @@ export function setSVGAttrs(props: SvgProps): Plugin {
 }
 
 /**
- * The SVGO plugin used when `extractStyles` is true.
+ * Add this plugin to enable `extractStyles`.
  */
 export const extractStyles: Plugin = {
 	name: "extractCSS",
@@ -175,7 +175,7 @@ export default function (options: SVGSFCOptions = {}): VitePlugin {
 		} = options;
 
 		const overrides: Record<string, boolean> = {
-			// Don't remove ID, as it may be referenced from outside.
+			// Don't remove IDs, it may be referenced from outside.
 			cleanupIDs: false,
 			removeViewBox: false,
 		};
@@ -183,6 +183,7 @@ export default function (options: SVGSFCOptions = {}): VitePlugin {
 		if (responsive) {
 			plugins.push(responsiveSVGAttrs);
 		}
+
 		if (minify) {
 			plugins.push({
 				name: "preset-default",
@@ -191,6 +192,7 @@ export default function (options: SVGSFCOptions = {}): VitePlugin {
 		} else {
 			plugins.push(...essential);
 		}
+
 		if (svgProps) {
 			plugins.push(setSVGAttrs(svgProps));
 		}
@@ -278,7 +280,7 @@ export default function (options: SVGSFCOptions = {}): VitePlugin {
 		 * e.g. "./image.svg?sfc" -> "/path/to/image.svg.vue?sfc"
 		 *
 		 * About the suffix:
-		 * The `.vue` extension allows other plugins to treat it as a vue file.
+		 * The `.vue` extension makes other plugins treat it as a vue file.
 		 * Keep the `?sfc` query to prevent vite:scan-deps to process it.
 		 */
 		async resolveId(id: string, importer: string) {
