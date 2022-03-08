@@ -49,18 +49,6 @@ export function setSVGAttrs(props: SvgProps): Plugin {
 }
 
 /**
- * Add this plugin to enable `extractStyles`.
- */
-export const extractStyles: Plugin = {
-	name: "extractCSS",
-	type: "perItem",
-	fn() {
-		throw new Error("This plugin is a placeholder and will be replaced with `extractCSS()`, " +
-			"it cannot be used outside vite-plugin-svg-sfc.");
-	},
-};
-
-/**
  * Remove all <style> elements and collect their content。
  *
  * @param styles store <style>'s content.
@@ -92,6 +80,44 @@ const essential: Plugin[] = [
 	"removeDoctype",
 	"removeXMLProcInst",
 ];
+
+type InternalPluginOptions = { name: "extractCSS" }
+	| { name: "responsiveSVGAttrs" }
+	| { name: "setSVGAttrs"; params?: SvgProps };
+
+type PluginEx = Plugin | InternalPluginOptions | InternalPluginOptions["name"]
+
+function resolveInternal(src: PluginEx[], dist: Plugin[], styles: string[]) {
+	for (const plugin of src) {
+		let name: string;
+		let params: any;
+
+		if (typeof plugin === "string") {
+			name = plugin;
+		} else {
+			name = plugin.name;
+			params = (plugin as any).params;
+		}
+
+		switch (name) {
+			case "extractCSS":
+				dist.push(extractCSS(styles));
+				break;
+			case "responsiveSVGAttrs":
+				dist.push(responsiveSVGAttrs);
+				break;
+			case "setSVGAttrs":
+				dist.push(setSVGAttrs(params));
+				break;
+			default:
+				dist.push(plugin as Plugin);
+		}
+	}
+}
+
+interface OptimizeOptionsEx extends Omit<OptimizeOptions, "plugins"> {
+	plugins?: PluginEx[];
+}
 
 export interface SVGSFCOptions {
 
@@ -152,7 +178,7 @@ export interface SVGSFCOptions {
 	 *
 	 * @default {}
 	 */
-	svgo?: OptimizeOptions | false;
+	svgo?: OptimizeOptionsEx | false;
 }
 
 /**
@@ -248,11 +274,7 @@ export default function (options: SVGSFCOptions = {}): VitePlugin {
 				return;
 			}
 			if (svgo.plugins) {
-				plugins.push(...svgo.plugins);
-				const i = plugins.indexOf(extractStyles);
-				if (i >= 0) {
-					plugins[i] = extractCSS(styles);
-				}
+				resolveInternal(svgo.plugins, plugins, styles);
 			} else {
 				applyPresets(isProduction);
 			}

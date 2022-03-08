@@ -8,7 +8,7 @@ import vue from "@vitejs/plugin-vue";
 import { createApp } from "vue";
 import { renderToString } from "@vue/server-renderer";
 import { convert, resolveFixture } from "./test-utils";
-import svgSfc, { extractStyles } from "../index";
+import svgSfc from "../index";
 
 const strokeSVG = readFileSync(resolveFixture("stroke.svg"), "utf8");
 
@@ -77,7 +77,7 @@ it("should work with @vitejs/plugin-vue", async () => {
 });
 
 it("should apply extractCSS plugin", async () => {
-	const svgo = { plugins: [extractStyles] };
+	const svgo = { plugins: ["extractCSS"] };
 	const code = await convert("styles-0.svg?sfc", { config: { svgo } });
 	expect(code).toMatchSnapshot();
 });
