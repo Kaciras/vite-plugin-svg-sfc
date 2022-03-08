@@ -6,6 +6,8 @@
 
 Vite plugin to convert SVGs to Vue single file components(SFC).
 
+[example](https://kaciras.github.io/vite-plugin-svg-sfc/)
+
 🚀 Features
 
 * Extract `<style>` tags from SVG to scoped SFC style block.
@@ -31,7 +33,7 @@ import svgSfc from "vite-plugin-svg-sfc";
 // const { default: svgSfc } = require("vite-plugin-svg-sfc");
 
 export default defineConfig({
-	plugins: [svgSfc(), vue()],
+    plugins: [svgSfc(), vue()],
 });
 ```
 
@@ -61,13 +63,13 @@ If you are using TypeScript, `vite-plugin-svg-sfc/client` can be added to `d.ts`
 
 ## Options
 
-### `extractStyles`
+### `extractCSS`
 
 Type: `boolean`
 
 Default: `true`
 
-When set to true, extract all style elements in the svg and put their content into a scoped SFC style block. This feature is not available when `svgo` option is false.
+When set to true, extract all style elements in the svg and put their content into a scoped SFC style block.
 
 Vue template compiler will throw an error when the template contains `<style>`, so we need to move them to top level.
 
@@ -108,23 +110,22 @@ Default: `{}`
 
 Specify the SVGO config to use, set to false to disable processing SVG data.
 
-If `svgo.plugins` is specified, the `extractStyles`, `minify`, `svgProps` and `responsive`options are ignored, you can add them manually:
+If `svgo.plugins` is specified, the `extractStyles`, `minify`, `svgProps` and `responsive` options are ignored, you can add them manually:
 
 ```typescript
-import svgSfc, {
-	responsiveSVGAttrs,
-	setSVGAttrs,
-	extractStyles,
-} from "vite-plugin-svg-sfc";
+import svgSfc from "vite-plugin-svg-sfc";
 
 svgSfc({
-	svgo: {
-		plugins: [
-			responsiveSVGAttrs,
-			setSVGAttrs({ foo: "bar" }),
-			"preset-default",
-			extractStyles,
-		]
-	}
+    svgo: {
+        plugins: [
+            "responsiveSVGAttrs",
+			"extractCSS",
+            "preset-default",
+            {
+                name: "setSVGAttrs",
+                params: { foo: "bar" }
+            }
+        ]
+    }
 });
 ```

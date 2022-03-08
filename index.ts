@@ -163,8 +163,8 @@ export interface SVGSFCOptions {
 	 *     svgo: {
 	 *         plugins: [
 	 *             "responsiveSVGAttrs",
-	 *             "preset-default",
 	 *             "extractCSS",
+	 *             "preset-default",
 	 *             {
 	 *                 name: "setSVGAttrs",
 	 *                 params: { foo: "bar" }
