@@ -1,6 +1,6 @@
 import { readFileSync } from "fs";
 import { Plugin as VitePlugin } from "vite";
-import { optimize, OptimizeOptions, Plugin } from "svgo";
+import { CustomPlugin, optimize, OptimizeOptions, Plugin } from "svgo";
 
 type SvgProps = Record<string, string>;
 
@@ -31,29 +31,27 @@ export const responsiveSVGAttrs: Plugin = {
  * The SVGO plugin for `svgProps` option.
  *
  * SVGO has a addAttributesToSVGElement plugin similar to this,
- * it cannot override existing attributes.
+ * but it cannot override existing attributes.
  *
  * @param props The attributes to add to <svg>
  */
-export function setSVGAttrs(props: SvgProps): Plugin {
-	return {
-		name: "setSVGAttrs",
-		type: "perItem",
-		fn(ast) {
-			const { type, name, attributes } = ast;
-			if (type === "element" && name === "svg") {
-				Object.assign(attributes, props);
-			}
-		},
-	};
-}
+export const setSVGAttrs: CustomPlugin<SvgProps> = {
+	name: "setSVGAttrs",
+	type: "perItem",
+	fn(ast, params) {
+		const { type, name, attributes } = ast;
+		if (type === "element" && name === "svg") {
+			Object.assign(attributes, params);
+		}
+	},
+};
 
 /**
  * Remove all <style> elements and collect their content。
  *
  * @param styles store <style>'s content.
  */
-function extractCSS(styles: string[]) {
+export function extractCSS(styles: string[]) {
 
 	function enter(node: any, parent: any) {
 		if (node.name !== "style") {
@@ -107,7 +105,7 @@ function resolveInternal(src: PluginEx[], dist: Plugin[], styles: string[]) {
 				dist.push(responsiveSVGAttrs);
 				break;
 			case "setSVGAttrs":
-				dist.push(setSVGAttrs(params));
+				dist.push({ ...setSVGAttrs, params });
 				break;
 			default:
 				dist.push(plugin as Plugin);
@@ -115,7 +113,7 @@ function resolveInternal(src: PluginEx[], dist: Plugin[], styles: string[]) {
 	}
 }
 
-interface OptimizeOptionsEx extends Omit<OptimizeOptions, "plugins"> {
+export interface SVGOptions extends Omit<OptimizeOptions, "plugins"> {
 	plugins?: PluginEx[];
 }
 
@@ -159,26 +157,25 @@ export interface SVGSFCOptions {
 	 * `svgProps` and `responsive` options are ignored, you can add them manually:
 	 *
 	 * @example
-	 * import svgSfc, {
-	 * 		responsiveSVGAttrs,
-	 *	 	setSVGAttrs,
-	 * 		extractStyles,
-	 * } from "vite-plugin-svg-sfc";
+	 * import svgSfc from "vite-plugin-svg-sfc";
 	 *
 	 * svgSfc({
 	 *     svgo: {
 	 *         plugins: [
-	 *             responsiveSVGAttrs,
-	 *             setSVGAttrs({ foo: "bar" }),
+	 *             "responsiveSVGAttrs",
 	 *             "preset-default",
-	 *             extractStyles,
+	 *             "extractCSS",
+	 *             {
+	 *                 name: "setSVGAttrs",
+	 *                 params: { foo: "bar" }
+	 *             }
 	 *         ]
 	 *     }
 	 * });
 	 *
 	 * @default {}
 	 */
-	svgo?: OptimizeOptionsEx | false;
+	svgo?: SVGOptions | false;
 }
 
 /**
@@ -220,7 +217,7 @@ export default function (options: SVGSFCOptions = {}): VitePlugin {
 		}
 
 		if (svgProps) {
-			plugins.push(setSVGAttrs(svgProps));
+			plugins.push({ ...setSVGAttrs, params: svgProps as any });
 		}
 
 		if (extractStyles) {
