@@ -111,7 +111,7 @@ it("should support HMR", async () => {
 	copyFixture("styles-0.svg", filename);
 
 	const server = await createServer({
-		logLevel: "info",
+		logLevel: "silent",
 		root: tmpDir,
 		server: {
 			port: 3000,
@@ -124,8 +124,9 @@ it("should support HMR", async () => {
 		plugins: [svgSfc(), vue()],
 	});
 
-	function receive() {
-		return new Promise(resolve => client.once("message", resolve)).then(JSON.parse);
+	async function receive() {
+		const buf = await new Promise<Buffer>(resolve => client.once("message", resolve));
+		return JSON.parse(buf.toString());
 	}
 
 	async function getStyleCode() {
@@ -134,21 +135,19 @@ it("should support HMR", async () => {
 	}
 
 	await server.listen();
-	const old = await getStyleCode();
 
 	const client = new WebSocket("ws://127.0.0.1:3000", "vite-hmr");
 	await receive();
 
+	expect(await getStyleCode()).contains("fill: blue;");
+
 	const waitForHMR = receive();
-
 	copyFixture("styles-1.svg", filename);
+	const hmr = await waitForHMR;
 
-	const style = (await waitForHMR).updates.find((e: any) => e.path === styleUrl);
+	const style = hmr.updates.find((e: any) => e.path === styleUrl);
 	expect(style.type).toBe("js-update");
-
-	const new1 = await getStyleCode();
-	expect(new1).contains("fill: red;");
-	expect(old).contains("fill: blue;");
+	expect(await getStyleCode()).contains("fill: red;");
 
 	client.close();
 	await server.close();
