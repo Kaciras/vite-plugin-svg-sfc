@@ -9,6 +9,7 @@ importers:
       '@kaciras/eslint-config-vue': ^2.3.0
       '@types/node': ^17.0.21
       '@types/svgo': ^2.6.2
+      '@types/ws': ^8.5.2
       '@vitejs/plugin-vue': ^2.2.4
       '@vue/server-renderer': ^3.2.29
       c8: ^7.11.0
@@ -19,6 +20,7 @@ importers:
       vite: ^2.8.6
       vitest: ^0.5.9
       vue: ^3.2.31
+      ws: ^8.5.0
     dependencies:
       svgo: 2.8.0
     devDependencies:
@@ -27,6 +29,7 @@ importers:
       '@kaciras/eslint-config-vue': 2.3.0_eslint@8.10.0+typescript@4.6.2
       '@types/node': 17.0.21
       '@types/svgo': 2.6.2
+      '@types/ws': 8.5.2
       '@vitejs/plugin-vue': 2.2.4_vite@2.8.6+vue@3.2.31
       '@vue/server-renderer': 3.2.31_vue@3.2.31
       c8: 7.11.0
@@ -36,6 +39,7 @@ importers:
       vite: 2.8.6
       vitest: 0.5.9_c8@7.11.0
       vue: 3.2.31
+      ws: 8.5.0
 
   example:
     specifiers:
@@ -189,6 +193,12 @@ packages:
 
   /@types/svgo/2.6.2:
     resolution: {integrity: sha512-m1SqMc/EDAZ8v0BBX+NmlYytUXtvrMD2/J9LICwnMvAuJwb0GSmACU3XPvcORqE7ghEJA4Mk6NYzpwhQI/biPw==}
+    dependencies:
+      '@types/node': 17.0.21
+    dev: true
+
+  /@types/ws/8.5.2:
+    resolution: {integrity: sha512-VXI82ykONr5tacHEojnErTQk+KQSoYbW1NB6iz6wUwrNd+BqfkfggQNoNdCqhJSzbNumShPERbM+Pc5zpfhlbw==}
     dependencies:
       '@types/node': 17.0.21
     dev: true
@@ -1823,6 +1833,19 @@ packages:
 
   /wrappy/1.0.2:
     resolution: {integrity: sha1-tSQ9jz7BqjXxNkYFvA0QNuMKtp8=}
+    dev: true
+
+  /ws/8.5.0:
+    resolution: {integrity: sha512-BWX0SWVgLPzYwF8lTzEy1egjhS4S4OEAHfsO8o65WOVsrnSRGaSiUaa9e0ggGlkMTtBlmOpEXiie9RUcBO86qg==}
+    engines: {node: '>=10.0.0'}
+    peerDependencies:
+      bufferutil: ^4.0.1
+      utf-8-validate: ^5.0.2
+    peerDependenciesMeta:
+      bufferutil:
+        optional: true
+      utf-8-validate:
+        optional: true
     dev: true
 
   /y18n/5.0.8:

@@ -1,14 +1,20 @@
+import { cwd } from "process";
 import { createRequire } from "module";
 import { readFileSync } from "fs";
 import { runInNewContext } from "vm";
 import { expect, it } from "vitest";
-import { build } from "vite";
+import { build, createServer } from "vite";
 import { RollupOutput } from "rollup";
 import vue from "@vitejs/plugin-vue";
 import { createApp } from "vue";
 import { renderToString } from "@vue/server-renderer";
-import { convert, resolveFixture } from "./test-utils";
+import { convert, copyFixture, resolveFixture, useTempDirectory } from "./test-utils";
 import svgSfc from "../index";
+import { join } from "path";
+import WebSocket from "ws";
+
+const input = "image.svg";
+const tmpDir = useTempDirectory(cwd());
 
 const strokeSVG = readFileSync(resolveFixture("stroke.svg"), "utf8");
 
@@ -95,4 +101,55 @@ it("should change <svg>'s attributes with svgProps", async () => {
 		},
 	};
 	expect(await convert("styles-0.svg?sfc", config)).toMatchSnapshot();
+});
+
+it("should support HMR", async () => {
+	const filename = join(tmpDir, "image.svg");
+	const mainUrl = `/${input}?sfc`;
+	const styleUrl = `/${filename}.vue?vue&type=style&index=0&scoped=true&lang.css`;
+
+	copyFixture("styles-0.svg", filename);
+
+	const server = await createServer({
+		logLevel: "info",
+		root: tmpDir,
+		server: {
+			port: 3000,
+		},
+		build: {
+			rollupOptions: {
+				input: input + "?sfc",
+			},
+		},
+		plugins: [svgSfc(), vue()],
+	});
+
+	function receive() {
+		return new Promise(resolve => client.once("message", resolve)).then(JSON.parse);
+	}
+
+	async function getStyleCode() {
+		await server.transformRequest(mainUrl);
+		return (await server.transformRequest(styleUrl))?.code;
+	}
+
+	await server.listen();
+	const old = await getStyleCode();
+
+	const client = new WebSocket("ws://127.0.0.1:3000", "vite-hmr");
+	await receive();
+
+	const waitForHMR = receive();
+
+	copyFixture("styles-1.svg", filename);
+
+	const style = (await waitForHMR).updates.find((e: any) => e.path === styleUrl);
+	expect(style.type).toBe("js-update");
+
+	const new1 = await getStyleCode();
+	expect(new1).contains("fill: red;");
+	expect(old).contains("fill: blue;");
+
+	client.close();
+	await server.close();
 });
