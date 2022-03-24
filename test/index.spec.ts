@@ -1,5 +1,6 @@
 import { cwd } from "process";
 import { createRequire } from "module";
+import { join } from "path";
 import { readFileSync } from "fs";
 import { runInNewContext } from "vm";
 import { expect, it } from "vitest";
@@ -8,10 +9,8 @@ import { RollupOutput } from "rollup";
 import vue from "@vitejs/plugin-vue";
 import { createApp } from "vue";
 import { renderToString } from "@vue/server-renderer";
-import { convert, copyFixture, resolveFixture, useTempDirectory } from "./test-utils";
+import { convert, copyFixture, resolveFixture, useTempDirectory, ViteHMRClient } from "./test-utils";
 import svgSfc from "../index";
-import { join } from "path";
-import WebSocket from "ws";
 
 const input = "image.svg";
 const tmpDir = useTempDirectory(cwd());
@@ -124,31 +123,23 @@ it("should support HMR", async () => {
 		plugins: [svgSfc(), vue()],
 	});
 
-	async function receive() {
-		const buf = await new Promise<Buffer>(resolve => client.once("message", resolve));
-		return JSON.parse(buf.toString());
-	}
-
 	async function getStyleCode() {
 		await server.transformRequest(mainUrl);
 		return (await server.transformRequest(styleUrl))?.code;
 	}
 
 	await server.listen();
-
-	const client = new WebSocket("ws://127.0.0.1:3000", "vite-hmr");
-	await receive();
+	const client = new ViteHMRClient(server);
 
 	expect(await getStyleCode()).contains("fill: blue;");
 
-	const waitForHMR = receive();
+	const waitForHMR = client.receive();
 	copyFixture("styles-1.svg", filename);
-	const hmr = await waitForHMR;
+	const { updates } = await waitForHMR;
 
-	const style = hmr.updates.find((e: any) => e.path === styleUrl);
-	expect(style.type).toBe("js-update");
+	const style = updates.find(e => e.path === styleUrl);
+	expect(style?.type).toBe("js-update");
 	expect(await getStyleCode()).contains("fill: red;");
 
-	client.close();
 	await server.close();
 });

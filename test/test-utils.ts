@@ -3,7 +3,8 @@ import { fileURLToPath } from "url";
 import { copyFileSync, mkdirSync, mkdtempSync, rmSync } from "fs";
 import { tmpdir } from "os";
 import { RollupOutput } from "rollup";
-import { build, Plugin } from "vite";
+import WebSocket from "ws";
+import { build, Plugin, UpdatePayload, ViteDevServer } from "vite";
 import { afterEach, beforeEach, expect } from "vitest";
 import svgSfc, { SVGSFCOptions } from "../index";
 
@@ -78,4 +79,18 @@ export function resolveFixture(name: string) {
 
 export function copyFixture(name: string, dist: string) {
 	copyFileSync(resolveFixture(name), dist);
+}
+
+export class ViteHMRClient {
+
+	private readonly ws: WebSocket;
+
+	constructor(server: ViteDevServer) {
+		this.ws = new WebSocket("ws://127.0.0.1:3000", "vite-hmr");
+		server.ws.on("close", () => this.ws.close());
+	}
+
+	receive(): Promise<UpdatePayload> {
+		return new Promise<string>(resolve => this.ws.once("message", resolve)).then(JSON.parse);
+	}
 }

@@ -119,7 +119,7 @@ svgSfc({
     svgo: {
         plugins: [
             "responsiveSVGAttrs",
-			"extractCSS",
+            "extractCSS",
             "preset-default",
             {
                 name: "setSVGAttrs",
