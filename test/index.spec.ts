@@ -112,9 +112,6 @@ it("should support HMR", async () => {
 	const server = await createServer({
 		logLevel: "silent",
 		root: tmpDir,
-		server: {
-			port: 3000,
-		},
 		build: {
 			rollupOptions: {
 				input: input + "?sfc",

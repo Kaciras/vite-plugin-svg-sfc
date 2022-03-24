@@ -7,6 +7,6 @@ export default defineConfig({
 		coverage: {
 			reporter: ["lcov"],
 		},
-		include: ["test/index.spec.ts"],
+		include: ["test/*.spec.ts"],
 	},
 });
