@@ -12,12 +12,16 @@
 		<pre class="language-shell"><code>pnpm i -D vite-plugin-svg-sfc</code></pre>
 		<pre class="language-js"><code v-html="configCode"></code></pre>
 	</div>
-	<section>
+	<section class="showcase">
 		<header>
 			<h1>Responsive size and color</h1>
-			<p></p>
+			<p>Replaced attributes with reactive value:</p>
+			<ul>
+				<li>set width & height to "1em".</li>
+				<li>set fill and stroke to "currentColor" if it's not transparent.</li>
+			</ul>
 		</header>
-		<div class="showcase">
+		<div>
 			<form>
 				<label>
 					color:
@@ -34,30 +38,37 @@
 			</div>
 		</div>
 	</section>
-	<section>
-		<div class="showcase">
+	<section class="showcase">
+		<div>
 			<SpringIcon class="style-demo"/>
 		</div>
 		<header>
 			<h1>&lt;style&gt; support</h1>
-			<p>vite-plugin-svg-sfc move &lt;style&gt; tags from SVG to SFC block, you can use</p>
+			<p>
+				vite-plugin-svg-sfc move &lt;style&gt; tags from SVG to SFC block,
+				you can use all the features of CSS including pseudo class,
+				media query, @keyframes etc...
+			</p>
 		</header>
 	</section>
-	<section>
+	<section class="showcase">
 		<header>
-			<h1>No </h1>
+			<h1>Work with vite:asset plugin</h1>
 			<p>vite-plugin-svg-sfc does not affect Vite default asset handling.</p>
 
-			<span class="import">spring.svg?sfc</span>
-			<SpringIcon class="import-case"/>
+			<div class="import-grid">
+				<span class="import">./assets/spring.svg?sfc</span>
+				<SpringIcon class="import-case"/>
 
-			<span class="import">spring.svg</span>
-			<img :src="ImportAsset" alt="test" class="import-case">
+				<span class="import">./assets/spring.svg</span>
+				<span>{{ ImportAsset }}</span>
 
-			<p><span class="import">spring.svg?url</span>{{ ImportUrl }}</p>
+				<span class="import">./assets/spring.svg?url</span>
+				<span>{{ ImportUrl }}</span>
+			</div>
 		</header>
-		<div class="showcase">
-			<span class="import">spring.svg?raw</span>
+		<div>
+			<span class="import">./assets/spring.svg?raw</span>
 			<pre class="svg-xml language-svg"><code v-html="svgCode"></code></pre>
 		</div>
 	</section>
@@ -98,16 +109,11 @@ body {
 	margin: 0;
 	font-family: sans-serif;
 	tab-size: 4;
+	line-height: 1.5;
 }
 
 h1 {
 	margin-top: 0;
-}
-
-pre {
-	padding: 8px;
-	font-size: 1rem;
-	background: #f7f7f7;
 }
 
 .button {
@@ -149,9 +155,16 @@ pre {
 section {
 	display: flex;
 	justify-content: center;
-	gap: 8%;
+	gap: 12px;
 	margin: 0 auto;
 	padding: 40px 10px;
+}
+
+label {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	margin: 5px;
 }
 
 .usage {
@@ -161,13 +174,14 @@ section {
 	padding: 40px 10px;
 }
 
-.install {
-	padding: 10px;
-	border-radius: 4px;
-	background: #f7f7f7;
+.import-grid {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	gap: 10px 20px;
+	align-items: center;
 }
 
-.showcase {
+.showcase > * {
 	width: 36%;
 }
 
@@ -184,6 +198,8 @@ form {
 }
 
 .style-demo {
+	display: block;
+	margin: 0 auto;
 	font-size: 200px;
 }
 
@@ -193,6 +209,7 @@ form {
 }
 
 .import {
+	grid-column: 1/2;
 	padding: 6px;
 	border-radius: 4px;
 	color: white;

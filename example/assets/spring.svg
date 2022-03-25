@@ -5,7 +5,7 @@
 			.b { fill:#fff; }
 			.s { fill:green; }
 
-			svg {
+			svg:not(:hover) {
 				animation: rotate 4s linear infinite;
 			}
 
