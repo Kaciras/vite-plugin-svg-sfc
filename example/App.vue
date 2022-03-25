@@ -1,15 +1,21 @@
 <template>
 	<header id="hero">
-		<h1>vite-svg-sfc</h1>
-		<h2>Convert SVG to Vue single file component (SFC)</h2>
+		<h1>vite-plugin-svg-sfc</h1>
+		<p>Convert SVG to Vue single file component (SFC)</p>
 		<a class="button" href="https://github.com/Kaciras/vite-plugin-svg-sfc">
 			<GitHubIcon/>
 			GitHub
 		</a>
 	</header>
+	<div class="usage">
+		<h1>Usage</h1>
+		<pre class="language-shell"><code>pnpm i -D vite-plugin-svg-sfc</code></pre>
+		<pre class="language-js"><code v-html="configCode"></code></pre>
+	</div>
 	<section>
 		<header>
 			<h1>Responsive size and color</h1>
+			<p></p>
 		</header>
 		<div class="showcase">
 			<form>
@@ -30,31 +36,37 @@
 	</section>
 	<section>
 		<div class="showcase">
-
+			<SpringIcon class="style-demo"/>
 		</div>
 		<header>
 			<h1>&lt;style&gt; support</h1>
+			<p>vite-plugin-svg-sfc move &lt;style&gt; tags from SVG to SFC block, you can use</p>
 		</header>
 	</section>
 	<section>
 		<header>
 			<h1>No </h1>
+			<p>vite-plugin-svg-sfc does not affect Vite default asset handling.</p>
+
+			<span class="import">spring.svg?sfc</span>
+			<SpringIcon class="import-case"/>
+
+			<span class="import">spring.svg</span>
+			<img :src="ImportAsset" alt="test" class="import-case">
+
+			<p><span class="import">spring.svg?url</span>{{ ImportUrl }}</p>
 		</header>
 		<div class="showcase">
-			<span class="import">?sfc</span>
-			<SpringIcon/>
-
-			<img :src="ImportAsset" alt="test">
-			<p><span class="import">?url</span>{{ ImportUrl }}</p>
-
-			<span class="import">?raw</span>
-			<pre><code>{{ ImportRaw }}</code></pre>
+			<span class="import">spring.svg?raw</span>
+			<pre class="svg-xml language-svg"><code v-html="svgCode"></code></pre>
 		</div>
 	</section>
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
+import { highlight, languages } from "prismjs";
+import ConfigText from "./demo-config.js?raw";
 import GitHubIcon from "bootstrap-icons/icons/github.svg?sfc";
 
 import AlarmIcon from "bootstrap-icons/icons/alarm-fill.svg?sfc";
@@ -64,10 +76,10 @@ import EnvelopeIcon2 from "bootstrap-icons/icons/envelope-paper-heart.svg?sfc";
 import SlidersIcon from "bootstrap-icons/icons/sliders.svg?sfc";
 import SnowIcon from "bootstrap-icons/icons/snow2.svg?sfc";
 
-import SpringIcon from "./assets/logo-spring-framework.svg?sfc";
-import ImportAsset from "./assets/logo-spring-framework.svg";
-import ImportUrl from "./assets/logo-spring-framework.svg?url";
-import ImportRaw from "./assets/logo-spring-framework.svg?raw";
+import SpringIcon from "./assets/spring.svg?sfc";
+import ImportAsset from "./assets/spring.svg";
+import ImportUrl from "./assets/spring.svg?url";
+import ImportRaw from "./assets/spring.svg?raw";
 
 const color = ref("#0aa96d");
 const size = ref(48);
@@ -76,16 +88,26 @@ const style = computed(() => ({
 	color: color.value,
 	fontSize: size.value + "px",
 }));
+
+const configCode = highlight(ConfigText, languages.javascript, "javascript");
+const svgCode = highlight(ImportRaw, languages.markup, "svg");
 </script>
 
 <style>
 body {
 	margin: 0;
 	font-family: sans-serif;
+	tab-size: 4;
 }
 
 h1 {
 	margin-top: 0;
+}
+
+pre {
+	padding: 8px;
+	font-size: 1rem;
+	background: #f7f7f7;
 }
 
 .button {
@@ -132,6 +154,19 @@ section {
 	padding: 40px 10px;
 }
 
+.usage {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 40px 10px;
+}
+
+.install {
+	padding: 10px;
+	border-radius: 4px;
+	background: #f7f7f7;
+}
+
 .showcase {
 	width: 36%;
 }
@@ -148,15 +183,25 @@ form {
 	justify-content: center;
 }
 
-pre {
-	padding: 8px;
+.style-demo {
+	font-size: 200px;
+}
+
+.svg-xml {
 	height: 20em;
 	overflow: scroll;
-	background: #f7f7f7;
 }
 
 .import {
-	padding: 4px;
-	background: #f7f7f7;
+	padding: 6px;
+	border-radius: 4px;
+	color: white;
+	background: #2e78ff;
+}
+
+.import-case {
+	font-size: 48px;
+	width: 48px;
+	height: 48px;
 }
 </style>

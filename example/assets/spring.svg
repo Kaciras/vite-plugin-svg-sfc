@@ -1,12 +1,24 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="208.47" height="208.47" viewBox="0 0 208.47 208.47">
 	<defs>
 		<style>
-			.a{fill:#68bd45;}.b{fill:#fff;}
-			.s{fill:green;}
+			.a { fill:#68bd45; }
+			.b { fill:#fff; }
+			.s { fill:green; }
+
+			svg {
+				animation: rotate 4s linear infinite;
+			}
+
+			@keyframes rotate  {
+				100% {
+					transform: rotate(360deg);
+				}
+			}
 		</style>
 		<style>
 			@media screen and (min-width: 1000px) {
-				.a{fill:#333;}.b{fill:red;}
+				.a { fill:#333; }
+				.b { fill:red; }
 			}
 		</style>
 	</defs>

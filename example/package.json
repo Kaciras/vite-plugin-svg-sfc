@@ -9,9 +9,11 @@
 	},
 	"dependencies": {
 		"bootstrap-icons": "^1.8.1",
+		"prismjs": "^1.27.0",
 		"vue": "^3.2.31"
 	},
 	"devDependencies": {
+		"@types/prismjs": "^1.26.0",
 		"@vitejs/plugin-vue": "^2.2.4",
 		"vite": "^2.8.6",
 		"vite-plugin-svg-sfc": "workspace:^"
