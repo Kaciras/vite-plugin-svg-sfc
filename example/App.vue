@@ -40,7 +40,7 @@
 	</section>
 	<section class="showcase">
 		<div>
-			<SpringIcon class="style-demo"/>
+			<GearIcon class="style-demo"/>
 		</div>
 		<header>
 			<h1>&lt;style&gt; support</h1>
@@ -57,18 +57,21 @@
 			<p>vite-plugin-svg-sfc does not affect Vite default asset handling.</p>
 
 			<div class="import-grid">
-				<span class="import">./assets/spring.svg?sfc</span>
-				<SpringIcon class="import-case"/>
+				<span class="import">./assets/gear.svg?sfc</span>
+				<span>(vue component)</span>
+				<GearIcon class="import-case"/>
 
-				<span class="import">./assets/spring.svg</span>
+				<span class="import">./assets/gear.svg</span>
 				<span>{{ ImportAsset }}</span>
+				<img class="import-case" :src="ImportAsset" alt="image">
 
-				<span class="import">./assets/spring.svg?url</span>
+				<span class="import">./assets/gear.svg?url</span>
 				<span>{{ ImportUrl }}</span>
+				<img class="import-case" :src="ImportUrl" alt="image">
 			</div>
 		</header>
 		<div>
-			<span class="import">./assets/spring.svg?raw</span>
+			<span class="import">./assets/gear.svg?raw</span>
 			<pre class="svg-xml language-svg"><code v-html="svgCode"></code></pre>
 		</div>
 	</section>
@@ -77,7 +80,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { highlight, languages } from "prismjs";
-import ConfigText from "./demo-config.js?raw";
+import ConfigText from "./demo-config.ts?raw";
 import GitHubIcon from "bootstrap-icons/icons/github.svg?sfc";
 
 import AlarmIcon from "bootstrap-icons/icons/alarm-fill.svg?sfc";
@@ -87,10 +90,10 @@ import EnvelopeIcon2 from "bootstrap-icons/icons/envelope-paper-heart.svg?sfc";
 import SlidersIcon from "bootstrap-icons/icons/sliders.svg?sfc";
 import SnowIcon from "bootstrap-icons/icons/snow2.svg?sfc";
 
-import SpringIcon from "./assets/spring.svg?sfc";
-import ImportAsset from "./assets/spring.svg";
-import ImportUrl from "./assets/spring.svg?url";
-import ImportRaw from "./assets/spring.svg?raw";
+import GearIcon from "./assets/gear.svg?sfc";
+import ImportAsset from "./assets/gear.svg";
+import ImportUrl from "./assets/gear.svg?url";
+import ImportRaw from "./assets/gear.svg?raw";
 
 const color = ref("#0aa96d");
 const size = ref(48);
@@ -114,6 +117,21 @@ body {
 
 h1 {
 	margin-top: 0;
+}
+
+section {
+	display: flex;
+	justify-content: center;
+	gap: 12px;
+	margin: 0 auto;
+	padding: 40px 10px;
+}
+
+label {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	margin: 5px;
 }
 
 .button {
@@ -152,19 +170,10 @@ h1 {
 	background: #f7f7f7;
 }
 
-section {
-	display: flex;
-	justify-content: center;
-	gap: 12px;
+.style-demo {
+	display: block;
 	margin: 0 auto;
-	padding: 40px 10px;
-}
-
-label {
-	display: inline-flex;
-	align-items: center;
-	gap: 5px;
-	margin: 5px;
+	font-size: 200px;
 }
 
 .usage {
@@ -174,12 +183,6 @@ label {
 	padding: 40px 10px;
 }
 
-.import-grid {
-	display: grid;
-	grid-template-columns: auto 1fr;
-	gap: 10px 20px;
-	align-items: center;
-}
 
 .showcase > * {
 	width: 36%;
@@ -197,15 +200,11 @@ form {
 	justify-content: center;
 }
 
-.style-demo {
-	display: block;
-	margin: 0 auto;
-	font-size: 200px;
-}
-
-.svg-xml {
-	height: 20em;
-	overflow: scroll;
+.import-grid {
+	display: grid;
+	grid-template-columns: auto auto 1fr;
+	gap: 10px 20px;
+	align-items: center;
 }
 
 .import {
@@ -217,8 +216,14 @@ form {
 }
 
 .import-case {
+	grid-column: 3/4;
 	font-size: 48px;
 	width: 48px;
 	height: 48px;
+}
+
+.svg-xml {
+	height: 20em;
+	overflow: scroll;
 }
 </style>
