@@ -9,7 +9,7 @@
 	},
 	"dependencies": {
 		"bootstrap-icons": "^1.8.1",
-		"prismjs": "^1.27.0",
+		"prismjs": "^1.28.0",
 		"vue": "^3.2.33"
 	},
 	"devDependencies": {
