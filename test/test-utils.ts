@@ -86,7 +86,8 @@ export class ViteHMRClient {
 	private readonly ws: WebSocket;
 
 	constructor(server: ViteDevServer) {
-		this.ws = new WebSocket("ws://127.0.0.1:3000", "vite-hmr");
+		const { port } = server.config.server;
+		this.ws = new WebSocket(`ws://localhost:${port}`, "vite-hmr");
 		server.ws.on("close", () => this.ws.close());
 	}
 

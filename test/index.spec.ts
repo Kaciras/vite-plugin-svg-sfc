@@ -1,8 +1,6 @@
 import { cwd } from "process";
-import { createRequire } from "module";
 import { join } from "path";
-import { readFileSync } from "fs";
-import { runInNewContext } from "vm";
+import { readFileSync, writeFileSync } from "fs";
 import { expect, it } from "vitest";
 import { build, createServer } from "vite";
 import { RollupOutput } from "rollup";
@@ -17,11 +15,10 @@ const tmpDir = useTempDirectory(cwd());
 
 const strokeSVG = readFileSync(resolveFixture("stroke.svg"), "utf8");
 
-function loadBundle<T = any>(code: string) {
-	const require = createRequire(import.meta.url);
-	const context: any = { exports: {}, require };
-	runInNewContext(code, context);
-	return context.exports.default as T;
+async function loadBundle<T = any>(code: string) {
+	const file = join(tmpDir, "test.js");
+	writeFileSync(file, code);
+	return (await import("file://" + file)).default as T;
 }
 
 it("should throw on non-SVG data", async () => {
@@ -76,7 +73,7 @@ it("should work with @vitejs/plugin-vue", async () => {
 	});
 	const { code } = (bundle as RollupOutput).output[0];
 
-	const component = loadBundle(code);
+	const component = await loadBundle(code);
 	const app = createApp(component, { width: 4396 });
 	expect(await renderToString(app)).toMatchSnapshot();
 });
