@@ -226,7 +226,7 @@ export default function (options: SVGSFCOptions = {}): VitePlugin {
 		}
 
 		if (minify) {
-			// Move it after extractCSS.
+			// Move it to after extractCSS since remove <style> may leave an empty <defs>.
 			overrides.removeUselessDefs = false;
 			plugins.push("removeUselessDefs");
 		}
@@ -266,14 +266,14 @@ export default function (options: SVGSFCOptions = {}): VitePlugin {
 		/**
 		 * Determine which SVGO plugins to use.
 		 */
-		configResolved({ isProduction }) {
+		configResolved({ mode }) {
 			if (svgo === false) {
 				return;
 			}
 			if (svgo.plugins) {
 				resolveInternal(svgo.plugins, plugins, styles);
 			} else {
-				applyPresets(isProduction);
+				applyPresets(mode === "production");
 			}
 		},
 
@@ -302,7 +302,7 @@ export default function (options: SVGSFCOptions = {}): VitePlugin {
 		 * The `.vue` extension makes other plugins treat it as a vue file.
 		 * Keep the `?sfc` query to prevent vite:scan-deps to process it.
 		 */
-		async resolveId(id: string, importer: string) {
+		async resolveId(id: string, importer?: string) {
 			if (id.startsWith("/@")) {
 				return null;
 			}
