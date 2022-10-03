@@ -2,7 +2,16 @@ import { readFileSync } from "fs";
 import { Plugin as VitePlugin } from "vite";
 import { CustomPlugin, optimize, OptimizeOptions, Plugin } from "svgo";
 
-type SvgProps = Record<string, string>;
+/**
+ * Called on each svg root element, modify the attrs in place.
+ *
+ * @param attrs Attributes of the <svg> element.
+ * @param path absolute file path
+ * @param passes multipass count
+ */
+export type ModifySVGProps = (attrs: Record<string, any>, path: string, passes: number) => void;
+
+type SVGPropsParam = Record<string, any> | ModifySVGProps;
 
 /**
  * The SVGO plugin used when `responsive` is true.
@@ -33,18 +42,24 @@ export const responsiveSVGAttrs: Plugin = {
  * SVGO has a addAttributesToSVGElement plugin similar to this,
  * but it cannot override existing attributes.
  *
- * @param props The attributes to add to <svg>
+ * @param params The attributes to add to <svg>
  */
-export const setSVGAttrs: CustomPlugin<SvgProps> = {
-	name: "setSVGAttrs",
-	type: "perItem",
-	fn(ast, params) {
-		const { type, name, attributes } = ast;
-		if (type === "element" && name === "svg") {
-			Object.assign(attributes, params);
-		}
-	},
-};
+function setSVGAttrs(params: SVGPropsParam): any {
+	const fn = typeof params === "function"
+		? params
+		: (attrs: any) => Object.assign(attrs, params);
+
+	return <CustomPlugin<ModifySVGProps>>{
+		name: "setSVGAttrs",
+		type: "perItem",
+		fn(ast, _, { path, multipassCount }) {
+			const { type, name, attributes } = ast;
+			if (type === "element" && name === "svg") {
+				fn(attributes, path, multipassCount);
+			}
+		},
+	};
+}
 
 /**
  * Remove all <style> elements and collect their content。
@@ -81,7 +96,7 @@ const essential: Plugin[] = [
 
 type InternalPluginOptions = { name: "extractCSS" }
 	| { name: "responsiveSVGAttrs" }
-	| { name: "setSVGAttrs"; params?: SvgProps };
+	| { name: "setSVGAttrs"; params?: SVGPropsParam };
 
 type PluginEx = Plugin | InternalPluginOptions | InternalPluginOptions["name"]
 
@@ -105,7 +120,7 @@ function resolveInternal(src: PluginEx[], dist: Plugin[], styles: string[]) {
 				dist.push(responsiveSVGAttrs);
 				break;
 			case "setSVGAttrs":
-				dist.push({ ...setSVGAttrs, params });
+				dist.push(setSVGAttrs(params));
 				break;
 			default:
 				dist.push(plugin as Plugin);
@@ -144,11 +159,11 @@ export interface SVGSFCOptions {
 	responsive?: boolean;
 
 	/**
-	 * Add props to the root SVG tag.
+	 * Modify attributes of the root SVG tag.
 	 *
 	 * @default undefined
 	 */
-	svgProps?: SvgProps;
+	svgProps?: SVGPropsParam;
 
 	/**
 	 * Specify SVGO config, set to false to disable processing SVG data.
@@ -217,7 +232,7 @@ export default function (options: SVGSFCOptions = {}): VitePlugin {
 		}
 
 		if (svgProps) {
-			plugins.push({ ...setSVGAttrs, params: svgProps as any });
+			plugins.push(setSVGAttrs(svgProps));
 		}
 
 		if (extractStyles) {

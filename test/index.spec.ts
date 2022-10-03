@@ -1,5 +1,5 @@
 import { cwd } from "process";
-import { join } from "path";
+import { basename, join } from "path";
 import { readFileSync, writeFileSync } from "fs";
 import { expect, it } from "vitest";
 import { build, createServer } from "vite";
@@ -7,8 +7,8 @@ import { RollupOutput } from "rollup";
 import vue from "@vitejs/plugin-vue";
 import { createApp } from "vue";
 import { renderToString } from "@vue/server-renderer";
-import { convert, copyFixture, resolveFixture, useTempDirectory, ViteHMRClient } from "./test-utils";
-import svgSfc from "../index";
+import { convert, copyFixture, resolveFixture, TestOptions, useTempDirectory, ViteHMRClient } from "./test-utils";
+import svgSfc from "../index.js";
 
 const input = "image.svg";
 const tmpDir = useTempDirectory(cwd());
@@ -88,11 +88,23 @@ it("should apply extractCSS plugin", async () => {
 });
 
 it("should change <svg>'s attributes with svgProps", async () => {
-	const config = {
+	const config: TestOptions = {
 		config: {
 			svgProps: {
 				":data-foo": "1",	// Add new
 				viewBox: "0 0 5 5",	// Replace
+			},
+		},
+	};
+	expect(await convert("styles-0.svg?sfc", config)).toMatchSnapshot();
+});
+
+it("should change <svg>'s attributes with custom function", async () => {
+	const config: TestOptions = {
+		config: {
+			svgProps(attrs, path, passes) {
+				attrs.path = basename(path);
+				attrs.passes = passes;
 			},
 		},
 	};

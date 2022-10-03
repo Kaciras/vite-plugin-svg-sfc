@@ -25,7 +25,7 @@ export const extractSFCPlugin: Plugin = {
 	},
 };
 
-interface TestOptions {
+export interface TestOptions {
 	mode?: string;
 	config?: SVGSFCOptions;
 }
