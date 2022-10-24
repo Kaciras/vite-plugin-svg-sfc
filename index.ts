@@ -1,4 +1,5 @@
 import { readFileSync } from "fs";
+import { Plugin as PluginFn, PluginInfo, XastElement } from "svgo/lib/types";
 import { Plugin as VitePlugin } from "vite";
 import { Config, CustomPlugin, optimize, PluginConfig } from "svgo";
 
@@ -13,32 +14,30 @@ export type ModifySVGProps = (attrs: Record<string, any>, path: string, passes: 
 
 type SVGPropsParam = Record<string, any> | ModifySVGProps;
 
+function preItem(fn: (node: XastElement, info: PluginInfo) => void): PluginFn<void> {
+	return (_, __, info) => ({ element: { enter: node => fn(node, info) } });
+}
+
 /**
  * The SVGO plugin used when `responsive` is true.
  */
 export const responsiveSVGAttrs: CustomPlugin = {
 	name: "responsiveSVGAttrs",
-	fn() {
-		return {
-			element: {
-				enter(ast) {
-					const { type, name, attributes } = ast;
+	fn: preItem(node => {
+		const { name, attributes } = node;
 
-					if (type === "element" && name === "svg") {
-						const { fill, stroke } = attributes;
+		if (name === "svg") {
+			const { fill, stroke } = attributes;
 
-						if (stroke && stroke !== "none") {
-							attributes.stroke = "currentColor";
-						}
-						if (fill !== "none") {
-							attributes.fill = "currentColor";
-						}
-						attributes.width = attributes.height = "1em";
-					}
-				},
-			},
-		};
-	},
+			if (stroke && stroke !== "none") {
+				attributes.stroke = "currentColor";
+			}
+			if (fill !== "none") {
+				attributes.fill = "currentColor";
+			}
+			attributes.width = attributes.height = "1em";
+		}
+	}),
 };
 
 /**
@@ -49,25 +48,21 @@ export const responsiveSVGAttrs: CustomPlugin = {
  *
  * @param params The attributes to add to <svg>
  */
-function setSVGAttrs(params: SVGPropsParam): any {
+function setSVGAttrs(params: SVGPropsParam): CustomPlugin {
 	const fn = typeof params === "function"
 		? params
 		: (attrs: any) => Object.assign(attrs, params);
 
-	return <CustomPlugin>{
+	return {
 		name: "setSVGAttrs",
-		fn(_, __, { path, multipassCount }) {
-			return {
-				element: {
-					enter(ast) {
-						const { type, name, attributes } = ast;
-						if (type === "element" && name === "svg") {
-							fn(attributes, path, multipassCount);
-						}
-					},
-				},
-			};
-		},
+		fn: preItem((node, info) => {
+			const { name, attributes } = node;
+			const { path, multipassCount } = info;
+
+			if (name === "svg") {
+				fn(attributes, path, multipassCount);
+			}
+		}),
 	};
 }
 
@@ -89,10 +84,8 @@ export function extractCSS(styles: string[]) {
 			.filter((c: unknown) => c !== node);
 	}
 
-	// @types/svgo does not include the new "visitor" type.
 	return <PluginConfig>{
 		name: "extractCSS",
-		type: "visitor",
 		fn: () => ({ element: { enter } }),
 	};
 }
