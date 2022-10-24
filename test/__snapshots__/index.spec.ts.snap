@@ -2,9 +2,9 @@
 
 exports[`should apply extractCSS plugin 1`] = `"<template><svg version=\\"1.1\\" xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"0 0 20 20\\"><defs/><rect id=\\"rect\\" width=\\"10\\" height=\\"10\\"/></svg></template><style scoped>#rect { fill: blue; }.st0 { width: 100px; }</style>"`;
 
-exports[`should change <svg>'s attributes with custom function 1`] = `"<template><svg xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"1em\\" height=\\"1em\\" fill=\\"currentColor\\" viewBox=\\"0 0 20 20\\" path=\\"styles-0.svg\\" passes=\\"0\\"><path id=\\"rect\\" d=\\"M0 0h10v10H0z\\"/></svg></template><style scoped>#rect{fill:#00f}.st0{width:100px}</style>"`;
+exports[`should change <svg>'s attributes with custom function 1`] = `"<template><svg xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"1em\\" height=\\"1em\\" fill=\\"currentColor\\" passes=\\"0\\" path=\\"styles-0.svg\\" viewBox=\\"0 0 20 20\\"><path id=\\"rect\\" d=\\"M0 0h10v10H0z\\"/></svg></template><style scoped>#rect{fill:#00f}.st0{width:100px}</style>"`;
 
-exports[`should change <svg>'s attributes with svgProps 1`] = `"<template><svg xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"1em\\" height=\\"1em\\" fill=\\"currentColor\\" viewBox=\\"0 0 5 5\\" :data-foo=\\"1\\"><path id=\\"rect\\" d=\\"M0 0h10v10H0z\\"/></svg></template><style scoped>#rect{fill:#00f}.st0{width:100px}</style>"`;
+exports[`should change <svg>'s attributes with svgProps 1`] = `"<template><svg xmlns=\\"http://www.w3.org/2000/svg\\" :data-foo=\\"1\\" width=\\"1em\\" height=\\"1em\\" fill=\\"currentColor\\" viewBox=\\"0 0 5 5\\"><path id=\\"rect\\" d=\\"M0 0h10v10H0z\\"/></svg></template><style scoped>#rect{fill:#00f}.st0{width:100px}</style>"`;
 
 exports[`should change attributes 1`] = `"<template><svg xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"1em\\" height=\\"1em\\" fill=\\"currentColor\\" viewBox=\\"0 0 20 20\\"><path id=\\"rect\\" d=\\"M0 0h10v10H0z\\"/></svg></template><style scoped>#rect{fill:#00f}.st0{width:100px}</style>"`;
 

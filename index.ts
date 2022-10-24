@@ -251,6 +251,10 @@ export default function (options: SVGSFCOptions = {}): VitePlugin {
 		}
 
 		if (minify) {
+			// Ensure sortAttrs can handle new attributes added by setSVGAttrs.
+			overrides.sortAttrs = false;
+			plugins.push("sortAttrs");
+
 			// Move it to after extractCSS since remove <style> may leave an empty <defs>.
 			overrides.removeUselessDefs = false;
 			plugins.push("removeUselessDefs");
