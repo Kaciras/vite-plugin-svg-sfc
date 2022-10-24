@@ -32,14 +32,13 @@
 		"test": "vitest run"
 	},
 	"dependencies": {
-		"svgo": "^2.8.0"
+		"svgo": "^3.0.0"
 	},
 	"devDependencies": {
 		"@kaciras/eslint-config-core": "^2.4.1",
 		"@kaciras/eslint-config-typescript": "^2.4.1",
 		"@kaciras/eslint-config-vue": "^2.4.1",
-		"@types/node": "^18.11.3",
-		"@types/svgo": "^2.6.4",
+		"@types/node": "^18.11.4",
 		"@types/ws": "^8.5.3",
 		"@vitejs/plugin-vue": "^3.1.0",
 		"@vitest/coverage-c8": "^0.24.3",

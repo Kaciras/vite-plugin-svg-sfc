@@ -1,6 +1,6 @@
 import { readFileSync } from "fs";
 import { Plugin as VitePlugin } from "vite";
-import { CustomPlugin, optimize, OptimizeOptions, Plugin } from "svgo";
+import { Config, CustomPlugin, optimize, PluginConfig } from "svgo";
 
 /**
  * Called on each svg root element, modify the attrs in place.
@@ -16,23 +16,28 @@ type SVGPropsParam = Record<string, any> | ModifySVGProps;
 /**
  * The SVGO plugin used when `responsive` is true.
  */
-export const responsiveSVGAttrs: Plugin = {
+export const responsiveSVGAttrs: CustomPlugin = {
 	name: "responsiveSVGAttrs",
-	type: "perItem",
-	fn(ast) {
-		const { type, name, attributes } = ast;
+	fn() {
+		return {
+			element: {
+				enter(ast) {
+					const { type, name, attributes } = ast;
 
-		if (type === "element" && name === "svg") {
-			const { fill, stroke } = attributes;
+					if (type === "element" && name === "svg") {
+						const { fill, stroke } = attributes;
 
-			if (stroke && stroke !== "none") {
-				attributes.stroke = "currentColor";
-			}
-			if (fill !== "none") {
-				attributes.fill = "currentColor";
-			}
-			attributes.width = attributes.height = "1em";
-		}
+						if (stroke && stroke !== "none") {
+							attributes.stroke = "currentColor";
+						}
+						if (fill !== "none") {
+							attributes.fill = "currentColor";
+						}
+						attributes.width = attributes.height = "1em";
+					}
+				},
+			},
+		};
 	},
 };
 
@@ -49,14 +54,19 @@ function setSVGAttrs(params: SVGPropsParam): any {
 		? params
 		: (attrs: any) => Object.assign(attrs, params);
 
-	return <CustomPlugin<ModifySVGProps>>{
+	return <CustomPlugin>{
 		name: "setSVGAttrs",
-		type: "perItem",
-		fn(ast, _, { path, multipassCount }) {
-			const { type, name, attributes } = ast;
-			if (type === "element" && name === "svg") {
-				fn(attributes, path, multipassCount);
-			}
+		fn(_, __, { path, multipassCount }) {
+			return {
+				element: {
+					enter(ast) {
+						const { type, name, attributes } = ast;
+						if (type === "element" && name === "svg") {
+							fn(attributes, path, multipassCount);
+						}
+					},
+				},
+			};
 		},
 	};
 }
@@ -80,7 +90,7 @@ export function extractCSS(styles: string[]) {
 	}
 
 	// @types/svgo does not include the new "visitor" type.
-	return <Plugin>{
+	return <PluginConfig>{
 		name: "extractCSS",
 		type: "visitor",
 		fn: () => ({ element: { enter } }),
@@ -88,7 +98,7 @@ export function extractCSS(styles: string[]) {
 }
 
 // Ensure the SVG has single root node.
-const essential: Plugin[] = [
+const essential: PluginConfig[] = [
 	"removeComments",
 	"removeDoctype",
 	"removeXMLProcInst",
@@ -98,9 +108,9 @@ type InternalPluginOptions = { name: "extractCSS" }
 	| { name: "responsiveSVGAttrs" }
 	| { name: "setSVGAttrs"; params?: SVGPropsParam };
 
-type PluginEx = Plugin | InternalPluginOptions | InternalPluginOptions["name"]
+type PluginEx = PluginConfig | InternalPluginOptions | InternalPluginOptions["name"]
 
-function resolveInternal(src: PluginEx[], dist: Plugin[], styles: string[]) {
+function resolveInternal(src: PluginEx[], dist: PluginConfig[], styles: string[]) {
 	for (const plugin of src) {
 		let name: string;
 		let params: any;
@@ -123,12 +133,12 @@ function resolveInternal(src: PluginEx[], dist: Plugin[], styles: string[]) {
 				dist.push(setSVGAttrs(params));
 				break;
 			default:
-				dist.push(plugin as Plugin);
+				dist.push(plugin as PluginConfig);
 		}
 	}
 }
 
-export interface SVGOptions extends Omit<OptimizeOptions, "plugins"> {
+export interface SVGOptions extends Omit<Config, "plugins"> {
 	plugins?: PluginEx[];
 }
 
@@ -198,7 +208,7 @@ export interface SVGSFCOptions {
  */
 export default function (options: SVGSFCOptions = {}): VitePlugin {
 	const { svgo = {} } = options;
-	const plugins: Plugin[] = [];
+	const plugins: PluginConfig[] = [];
 
 	// It's ok to use shared array between each module,
 	// because SVGO runs synchronously, just empty the array before optimize.
@@ -214,7 +224,7 @@ export default function (options: SVGSFCOptions = {}): VitePlugin {
 
 		const overrides: Record<string, boolean> = {
 			// Don't remove IDs, it may be referenced from outside.
-			cleanupIDs: false,
+			cleanupIds: false,
 			removeViewBox: false,
 		};
 
@@ -251,16 +261,7 @@ export default function (options: SVGSFCOptions = {}): VitePlugin {
 		styles.length = 0;
 
 		if (svgo) {
-			const result = optimize(code, {
-				...svgo,
-				path,
-				plugins,
-			});
-			if (!result.modernError) {
-				code = result.data;
-			} else {
-				throw result.modernError;
-			}
+			code = optimize(code, { ...svgo, path, plugins }).data;
 		}
 
 		code = `<template>${code}</template>`;
