@@ -103,34 +103,6 @@ type InternalPluginOptions = { name: "extractCSS" }
 
 type PluginEx = PluginConfig | InternalPluginOptions | InternalPluginOptions["name"]
 
-function resolveInternal(src: PluginEx[], dist: PluginConfig[], styles: string[]) {
-	for (const plugin of src) {
-		let name: string;
-		let params: any;
-
-		if (typeof plugin === "string") {
-			name = plugin;
-		} else {
-			name = plugin.name;
-			params = (plugin as any).params;
-		}
-
-		switch (name) {
-			case "extractCSS":
-				dist.push(extractCSS(styles));
-				break;
-			case "responsiveSVGAttrs":
-				dist.push(responsiveSVGAttrs);
-				break;
-			case "setSVGAttrs":
-				dist.push(setSVGAttrs(params));
-				break;
-			default:
-				dist.push(plugin as PluginConfig);
-		}
-	}
-}
-
 export interface SVGOptions extends Omit<Config, "plugins"> {
 	plugins?: PluginEx[];
 }
@@ -196,20 +168,66 @@ export interface SVGSFCOptions {
 	svgo?: SVGOptions | false;
 }
 
-/**
- * Convert SVG to Vue SFC, you may need another plugin to process the .vue file。
- */
-export default function (options: SVGSFCOptions = {}): VitePlugin {
-	const { svgo = {} } = options;
-	const plugins: PluginConfig[] = [];
+export class SVGSFCConvertor {
 
-	// It's ok to use shared array between each module,
-	// because SVGO runs synchronously, just empty the array before optimize.
-	const styles: string[] = [];
+	private readonly plugins: PluginConfig[] = [];
 
-	function applyPresets(isProd: boolean) {
+	/*
+	 * It's ok to use shared array between each module,
+	 * because SVGO runs synchronously, just empty the array before optimize.
+	 */
+	private readonly styles: string[] = [];
+
+	private readonly svgo?: SVGOptions | false;
+
+	public constructor(options: SVGSFCOptions = {}) {
+		const { svgo = {} } = options;
+		this.svgo = svgo;
+
+		if (svgo === false) {
+			return;
+		}
+		if (svgo.plugins) {
+			this.resolveInternal(svgo.plugins);
+		} else {
+			this.applyPresets(options);
+		}
+	}
+
+	private resolveInternal(src: PluginEx[]) {
+		const { plugins, styles } = this;
+
+		for (const plugin of src) {
+			let name: string;
+			let params: any;
+
+			if (typeof plugin === "string") {
+				name = plugin;
+			} else {
+				name = plugin.name;
+				params = (plugin as any).params;
+			}
+
+			switch (name) {
+				case "extractCSS":
+					plugins.push(extractCSS(styles));
+					break;
+				case "responsiveSVGAttrs":
+					plugins.push(responsiveSVGAttrs);
+					break;
+				case "setSVGAttrs":
+					plugins.push(setSVGAttrs(params));
+					break;
+				default:
+					plugins.push(plugin as PluginConfig);
+			}
+		}
+	}
+
+	private applyPresets(options: SVGSFCOptions) {
+		const { plugins, styles } = this;
 		const {
-			minify = isProd,
+			minify,
 			svgProps,
 			extractStyles = true,
 			responsive = true,
@@ -254,21 +272,35 @@ export default function (options: SVGSFCOptions = {}): VitePlugin {
 		}
 	}
 
-	function svg2sfc(code: string, path: string) {
+	/**
+	 * Convert the SVG code to Vue SFC code.
+	 *
+	 * @param svg the SVG code.
+	 * @param path The path of the SVG file, can be used by plugins.
+	 */
+	convert(svg: string, path?: string) {
+		const { styles, plugins, svgo } = this;
 		styles.length = 0;
 
 		if (svgo) {
-			code = optimize(code, { ...svgo, path, plugins }).data;
+			svg = optimize(svg, { ...svgo, path, plugins }).data;
 		}
 
-		code = `<template>${code}</template>`;
+		svg = `<template>${svg}</template>`;
 		if (styles.length === 0) {
-			return code;
+			return svg;
 		} else {
 			const css = styles.join("");
-			return `${code}<style scoped>${css}</style>`;
+			return `${svg}<style scoped>${css}</style>`;
 		}
 	}
+}
+
+/**
+ * Convert SVG to Vue SFC, you may need another plugin to process the .vue file。
+ */
+export default function (options: SVGSFCOptions = {}): VitePlugin {
+	let svg2sfc: SVGSFCConvertor;
 
 	return {
 		name: "vite-plugin-svg-sfc",
@@ -280,14 +312,8 @@ export default function (options: SVGSFCOptions = {}): VitePlugin {
 		 * Determine which SVGO plugins to use.
 		 */
 		configResolved({ mode }) {
-			if (svgo === false) {
-				return;
-			}
-			if (svgo.plugins) {
-				resolveInternal(svgo.plugins, plugins, styles);
-			} else {
-				applyPresets(mode === "production");
-			}
+			const minify = mode === "production";
+			svg2sfc = new SVGSFCConvertor({ minify, ...options });
 		},
 
 		/**
@@ -350,7 +376,7 @@ export default function (options: SVGSFCOptions = {}): VitePlugin {
 		load(id: string) {
 			if (id.endsWith(".svg.vue?sfc")) {
 				const path = id.slice(0, -8);
-				return svg2sfc(readFileSync(path, "utf8"), path);
+				return svg2sfc.convert(readFileSync(path, "utf8"), path);
 			}
 		},
 	};
