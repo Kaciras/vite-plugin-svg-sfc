@@ -4,7 +4,7 @@
 [![Test](https://github.com/Kaciras/vite-plugin-svg-sfc/actions/workflows/test.yml/badge.svg)](https://github.com/Kaciras/vite-plugin-svg-sfc/actions/workflows/test.yml)
 [![codecov](https://codecov.io/gh/Kaciras/vite-plugin-svg-sfc/branch/master/graph/badge.svg?token=LJ6ZXPWJWP)](https://codecov.io/gh/Kaciras/vite-plugin-svg-sfc)
 
-Vite plugin to convert SVGs to Vue single file components(SFC).
+Vite (also support Rollup) plugin to convert SVGs to Vue single file components(SFC).
 
 [example](https://kaciras.github.io/vite-plugin-svg-sfc/)
 
@@ -59,6 +59,17 @@ If you are using TypeScript, `vite-plugin-svg-sfc/client` can be added to `d.ts`
 
 ```typescript
 /// <reference types="vite-plugin-svg-sfc/client" />
+```
+
+### Without Vite
+
+`SVGSFCConvertor` is exported for convert SVG to SFC code without build tools.
+
+```typescript
+import { SVGSFCConvertor } from "vite-plugin-svg-sfc";
+
+const svg2sfc = new SVGSFCConvertor();
+const vueCode = svg2sfc.convert("<svg>...</svg>");
 ```
 
 ## Options

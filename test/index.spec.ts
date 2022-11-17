@@ -6,7 +6,7 @@ import { build, createServer } from "vite";
 import { RollupOutput } from "rollup";
 import vue from "@vitejs/plugin-vue";
 import { createApp } from "vue";
-import { renderToString } from "@vue/server-renderer";
+import { renderToString } from "vue/server-renderer";
 import { convert, copyFixture, resolveFixture, TestOptions, useTempDirectory, ViteHMRClient } from "./test-utils";
 import svgSfc from "../index.js";
 

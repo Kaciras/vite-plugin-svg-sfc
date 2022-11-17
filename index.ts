@@ -184,17 +184,17 @@ export class SVGSFCConvertor {
 		const { svgo = {} } = options;
 		this.svgo = svgo;
 
+		// Determine which SVGO plugins to use.
 		if (svgo === false) {
-			return;
-		}
-		if (svgo.plugins) {
-			this.resolveInternal(svgo.plugins);
+			// SVGO optimization disabled.
+		} else if (svgo.plugins) {
+			this.resolve(svgo.plugins);
 		} else {
 			this.applyPresets(options);
 		}
 	}
 
-	private resolveInternal(src: PluginEx[]) {
+	private resolve(src: PluginEx[]) {
 		const { plugins, styles } = this;
 
 		for (const plugin of src) {
@@ -273,7 +273,7 @@ export class SVGSFCConvertor {
 	}
 
 	/**
-	 * Convert the SVG code to Vue SFC code.
+	 * Convert the SVG XML to Vue SFC code.
 	 *
 	 * @param svg the SVG code.
 	 * @param path The path of the SVG file, can be used by plugins.
@@ -308,9 +308,6 @@ export default function (options: SVGSFCOptions = {}): VitePlugin {
 		// This plugin must run before vite:asset and other plugins that process .vue files.
 		enforce: "pre",
 
-		/**
-		 * Determine which SVGO plugins to use.
-		 */
 		configResolved({ mode }) {
 			const minify = mode === "production";
 			svg2sfc = new SVGSFCConvertor({ minify, ...options });
