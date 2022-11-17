@@ -51,6 +51,14 @@ it("should not minify on dev mode", async () => {
 	expect(await convert("stroke.svg?sfc", { mode: "development" })).toMatchSnapshot();
 });
 
+it("should support set minify in options", async () => {
+	const code = await convert("stroke.svg?sfc", {
+		mode: "production",
+		config: { minify: false },
+	});
+	expect(code).toMatch("<title>Untitled-1</title>");
+});
+
 it("should extract styles", async () => {
 	const code = await convert("styles-0.svg?sfc");
 	expect(code.toString()).toMatchSnapshot();
