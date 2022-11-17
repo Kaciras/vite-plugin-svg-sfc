@@ -7,6 +7,9 @@ export default defineConfig({
 		coverage: {
 			reporter: ["lcov"],
 		},
-		include: ["test/*.spec.ts"],
+		include: [
+			"test/*.spec.ts", 
+			"test/rollup-test.ts",
+		],
 	},
 });

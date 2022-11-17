@@ -317,6 +317,13 @@ export default function (options: SVGSFCOptions = {}): VitePlugin {
 		},
 
 		/**
+		 * For Rollup compatibility. This hook is called after configResolved().
+		 */
+		buildStart() {
+			svg2sfc ??= new SVGSFCConvertor(options);
+		},
+
+		/**
 		 * When a svg file changed, we look for corresponding SFC modules,
 		 * if present, add them to affected module list.
 		 */
