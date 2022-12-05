@@ -100,7 +100,7 @@ Type: `boolean`
 
 Default: `true`
 
-When set to true, some attributes on <svg> will be replaced with reactive value:
+When set to true, some attributes on `<svg>` will be replaced with reactive value:
 
 * set width & height to "1em".
 * set fill and stroke to "currentColor" if it's not transparent。
