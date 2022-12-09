@@ -1,18 +1,18 @@
 <template>
-	<header id="hero">
+	<header id='hero'>
 		<h1>vite-plugin-svg-sfc</h1>
 		<p>Convert SVG to Vue single file component (SFC)</p>
-		<a class="button" href="https://github.com/Kaciras/vite-plugin-svg-sfc">
+		<a class='button' href='https://github.com/Kaciras/vite-plugin-svg-sfc'>
 			<GitHubIcon/>
 			GitHub
 		</a>
 	</header>
-	<div class="usage">
+	<div class='usage'>
 		<h1>Usage</h1>
-		<pre class="language-shell"><code>pnpm i -D vite-plugin-svg-sfc</code></pre>
-		<pre class="language-js"><code v-html="configCode"></code></pre>
+		<pre class='language-shell'><code>pnpm i -D vite-plugin-svg-sfc</code></pre>
+		<pre class='language-js'><code v-html='configCode'></code></pre>
 	</div>
-	<section class="showcase">
+	<section class='showcase'>
 		<header>
 			<h1>Responsive size and color</h1>
 			<p>Replaced attributes with reactive value:</p>
@@ -25,22 +25,22 @@
 			<form>
 				<label>
 					color:
-					<input type="color" v-model="color">
+					<input type='color' v-model='color'>
 				</label>
 				<label>
 					font-size(px):
-					<input type="number" min="0" v-model="size">
+					<input type='number' min='0' v-model='size'>
 				</label>
 			</form>
-			<div class="grid" :style="style">
+			<div class='grid' :style='style'>
 				<AlarmIcon/><EnvelopeIcon/><SlidersIcon/>
 				<AlarmIcon2/><EnvelopeIcon2/><SnowIcon/>
 			</div>
 		</div>
 	</section>
-	<section class="showcase">
+	<section class='showcase'>
 		<div>
-			<GearIcon class="style-demo"/>
+			<GearIcon class='style-demo'/>
 		</div>
 		<header>
 			<h1>&lt;style&gt; support</h1>
@@ -51,28 +51,28 @@
 			</p>
 		</header>
 	</section>
-	<section class="showcase">
+	<section class='showcase'>
 		<header>
 			<h1>Work with vite:asset plugin</h1>
 			<p>vite-plugin-svg-sfc does not affect Vite default asset handling.</p>
 
-			<div class="import-grid">
-				<span class="import">./assets/gear.svg?sfc</span>
+			<div class='import-grid'>
+				<span class='import'>./assets/gear.svg?sfc</span>
 				<span>(vue component)</span>
-				<GearIcon class="import-case"/>
+				<GearIcon class='import-case'/>
 
-				<span class="import">./assets/gear.svg</span>
+				<span class='import'>./assets/gear.svg</span>
 				<span>{{ ImportAsset }}</span>
-				<img class="import-case" :src="ImportAsset" alt="image">
+				<img class='import-case' :src='ImportAsset' alt='image'>
 
-				<span class="import">./assets/gear.svg?url</span>
+				<span class='import'>./assets/gear.svg?url</span>
 				<span>{{ ImportUrl }}</span>
-				<img class="import-case" :src="ImportUrl" alt="image">
+				<img class='import-case' :src='ImportUrl' alt='image'>
 			</div>
 		</header>
 		<div>
-			<span class="import">./assets/gear.svg?raw</span>
-			<pre class="svg-xml language-svg"><code v-html="svgCode"></code></pre>
+			<span class='import'>./assets/gear.svg?raw</span>
+			<pre class='svg-xml language-svg'><code v-html='svgCode'></code></pre>
 		</div>
 	</section>
 </template>
@@ -95,7 +95,7 @@ import ImportAsset from "./assets/gear.svg";
 import ImportUrl from "./assets/gear.svg?url";
 import ImportRaw from "./assets/gear.svg?raw";
 
-const color = ref("#0aa96d");
+const color = ref("#05a267");
 const size = ref(48);
 
 const style = computed(() => ({
@@ -108,6 +108,10 @@ const svgCode = highlight(ImportRaw, languages.markup, "svg");
 </script>
 
 <style>
+:root {
+	--main-color: #008856;
+}
+
 body {
 	margin: 0;
 	font-family: sans-serif;
@@ -140,8 +144,8 @@ label {
 	gap: 5px;
 	padding: 8px 16px;
 
-	color: #0aa96d;
-	border: 1px solid #0aa96d;
+	color: var(--main-color);
+	border: 1px solid var(--main-color);
 	border-radius: 4px;
 	outline: none;
 	text-decoration: none;
@@ -149,13 +153,13 @@ label {
 }
 
 .button:visited {
-	color: #0aa96d;
+	color: var(--main-color);
 }
 
 .button:hover,
 .button:focus-visible {
 	color: white;
-	background: #0aa96d;
+	background: var(--main-color);
 }
 
 .button > svg {
@@ -212,7 +216,7 @@ form {
 	padding: 6px;
 	border-radius: 4px;
 	color: white;
-	background: #2e78ff;
+	background: #008856;
 }
 
 .import-case {
