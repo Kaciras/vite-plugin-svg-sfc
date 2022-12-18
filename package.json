@@ -1,6 +1,6 @@
 {
 	"name": "vite-plugin-svg-sfc",
-	"version": "1.1.0",
+	"version": "1.2.0",
 	"description": "Convert SVGs to Vue single file component(SFC), support <style> tag",
 	"author": "Kaciras <Kaciras@outlook.com>",
 	"license": "MIT",
