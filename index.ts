@@ -266,7 +266,7 @@ export class SVGSFCConvertor {
 			overrides.sortAttrs = false;
 			plugins.push("sortAttrs");
 
-			// Move it to after extractCSS since remove <style> may leave an empty <defs>.
+			// Move it to after extractCSS since remove <style> may leave empty <defs>.
 			overrides.removeUselessDefs = false;
 			plugins.push("removeUselessDefs");
 		}
@@ -343,7 +343,7 @@ export default function (options: SVGSFCOptions = {}): VitePlugin {
 		 *
 		 * About the suffix:
 		 * The `.vue` extension makes other plugins treat it as a vue file.
-		 * Keep the `?sfc` query to prevent vite:scan-deps to process it.
+		 * Keep the `?sfc` query to prevent vite:dep-scan to process it.
 		 */
 		async resolveId(id: string, importer?: string) {
 			if (id.startsWith("/@")) {

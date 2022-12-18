@@ -4,7 +4,7 @@
 [![Test](https://github.com/Kaciras/vite-plugin-svg-sfc/actions/workflows/test.yml/badge.svg)](https://github.com/Kaciras/vite-plugin-svg-sfc/actions/workflows/test.yml)
 [![codecov](https://codecov.io/gh/Kaciras/vite-plugin-svg-sfc/branch/master/graph/badge.svg?token=LJ6ZXPWJWP)](https://codecov.io/gh/Kaciras/vite-plugin-svg-sfc)
 
-Vite (also support Rollup) plugin to convert SVGs to Vue single file components(SFC).
+Vite (also support Rollup) plugin to convert SVGs to Vue single file components (SFC).
 
 [example](https://kaciras.github.io/vite-plugin-svg-sfc/)
 
@@ -51,7 +51,7 @@ import MyIconComponent from "../assets/my-icon.svg?sfc";
 
 // vite-plugin-svg-sfc does not affect Vite default asset handling.
 import myIconUrl from "../assets/my-icon.svg";
-import myIconXml from "../assets/my-icon.svg?raw";
+import myIconRaw from "../assets/my-icon.svg?raw";
 </script>
 ```
 
@@ -70,6 +70,7 @@ import { SVGSFCConvertor } from "vite-plugin-svg-sfc";
 
 const svg2sfc = new SVGSFCConvertor();
 const vueCode = svg2sfc.convert("<svg>...</svg>");
+// <template><svg>...</svg></template>...
 ```
 
 ## Options
