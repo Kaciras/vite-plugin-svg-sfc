@@ -75,6 +75,24 @@ const vueCode = svg2sfc.convert("<svg>...</svg>");
 
 ## Options
 
+### mark
+
+Type: `string`
+
+Default: `sfc`
+
+SVG will be imported as SFC using the query parameter.
+
+```javascript
+// vite.config.js
+export default defineConfig({
+    plugins: [svgSfc({ mark: "component" }), vue()],
+});
+
+// Vue component.
+import Icon from "../assets/my-icon.svg?component";
+```
+
 ### `extractCSS`
 
 Type: `boolean`

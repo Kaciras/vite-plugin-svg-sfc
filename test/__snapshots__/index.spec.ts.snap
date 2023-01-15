@@ -18,4 +18,6 @@ exports[`should remove processing instruction in dev 1`] = `"<template><svg vers
 
 exports[`should remove processing instruction in prod 1`] = `"<template><svg xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"1em\\" height=\\"1em\\" fill=\\"currentColor\\"><path d=\\"M0 0h24v24H0zm0 0h24v24H0zm0 0h24v24H0zm0 0h24v24H0z\\"/></svg></template>"`;
 
+exports[`should support custom mark 1`] = `"<template><svg xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"1em\\" height=\\"1em\\" fill=\\"currentColor\\" viewBox=\\"0 0 20 20\\"><path id=\\"rect\\" d=\\"M0 0h10v10H0z\\"/></svg></template><style scoped>#rect{fill:#00f}.st0{width:100px}</style>"`;
+
 exports[`should work with @vitejs/plugin-vue 1`] = `"<svg xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"4396\\" height=\\"1em\\" fill=\\"currentColor\\" viewbox=\\"0 0 20 20\\" data-v-1d0ce38e><path id=\\"rect\\" d=\\"M0 0h10v10H0z\\" data-v-1d0ce38e></path></svg>"`;

@@ -7,7 +7,15 @@ import { RollupOutput } from "rollup";
 import vue from "@vitejs/plugin-vue";
 import { createApp } from "vue";
 import { renderToString } from "vue/server-renderer";
-import { convert, copyFixture, resolveFixture, TestOptions, useTempDirectory, ViteHMRClient } from "./test-utils";
+import {
+	compile,
+	convert,
+	copyFixture,
+	resolveFixture,
+	TestOptions,
+	useTempDirectory,
+	ViteHMRClient,
+} from "./test-utils";
 import svgSfc from "../index.js";
 
 const input = "image.svg";
@@ -29,6 +37,13 @@ it("should throw on non-SVG data", async () => {
 it("should throw on non-exists file", async () => {
 	const build = convert("not exists.svg?sfc");
 	await expect(build).rejects.toThrow();
+});
+
+it("should keep query in the URL", async () => {
+	const bundle = await compile("stroke.svg?foo=1&sfc&bar");
+	const absPath = resolveFixture("stroke.svg").replaceAll("\\", "/");
+	expect(bundle.output[0].facadeModuleId)
+		.toBe(absPath + ".vue?foo=1&sfc&bar");
 });
 
 it("should change attributes", async () => {
@@ -57,6 +72,13 @@ it("should support set minify in options", async () => {
 		config: { minify: false },
 	});
 	expect(code).toMatch("<title>Untitled-1</title>");
+});
+
+it("should support custom mark", async () => {
+	const code = await convert("styles-0.svg?component", { 
+		config: { mark: "component" },
+	});
+	expect(code).toMatchSnapshot();
 });
 
 it("should extract styles", async () => {

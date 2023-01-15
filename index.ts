@@ -296,10 +296,35 @@ export class SVGSFCConvertor {
 	}
 }
 
+export interface SVGSFCPluginOptions extends SVGSFCOptions {
+
+	/**
+	 * SVG will be imported as SFC using the query parameter.
+	 *
+	 * @example
+	 * // vite.config.js
+	 * export default defineConfig({
+	 *     plugins: [svgSfc({ mark: "component" }), vue()],
+	 * });
+	 *
+	 * // Vue component.
+	 * import Icon from "../assets/my-icon.svg?component";
+	 *
+	 * @default "sfc"
+	 */
+	mark?: string;
+}
+
+function parseRequest(id: string): [string, URLSearchParams, string] {
+	const [path, query] = id.split("?", 2);
+	return [path, new URLSearchParams(query), query];
+}
+
 /**
- * Convert SVG to Vue SFC, you may need another plugin to process the .vue file。
+ * Convert SVG to Vue SFC, you need another plugin to process the .vue file。
  */
-export default function (options: SVGSFCOptions = {}): VitePlugin {
+export default function (options: SVGSFCPluginOptions = {}): VitePlugin {
+	const { mark = "sfc" } = options;
 	let svg2sfc: SVGSFCConvertor;
 
 	return {
@@ -349,37 +374,31 @@ export default function (options: SVGSFCOptions = {}): VitePlugin {
 			if (id.startsWith("/@")) {
 				return null;
 			}
-			let suffix: string;
+			const [path, params, query] = parseRequest(id);
 
-			if (id.endsWith("svg?sfc")) {
+			if (path.endsWith(".svg") && params.has(mark)) {
 				// Original import (*.svg?sfc)
-				id = id.slice(0, -4);
-				suffix = ".vue?sfc";
+				id = path;
 			} else {
 				// virtual .vue file (*.svg.vue?sfc)
-				// or SFC submodule (*.svg.vue?vue),
-				// resolve to absolute path and keep the query.
-				const [path, query] = id.split("?", 2);
+				// or SFC submodule (*.svg.vue?vue).
 				if (!path.endsWith(".svg.vue")) {
 					return null;
 				}
 				id = path.slice(0, -4);
-				suffix = ".vue";
-				if (query) {
-					suffix += "?" + query;
-				}
 			}
 
 			const r = await this.resolve(id, importer, { skipSelf: true });
-			if (r) {
-				return r.id + suffix;
+			if (!r) {
+				throw new Error("Cannot resolve file: " + id);
 			}
-			throw new Error("Cannot resolve file: " + id);
+			return query ? `${r.id}.vue?${query}` : `${r.id}.vue`;
 		},
 
 		load(id: string) {
-			if (id.endsWith(".svg.vue?sfc")) {
-				const path = id.slice(0, -8);
+			const [vPath, params] = parseRequest(id);
+			if (vPath.endsWith(".svg.vue") && params.has(mark)) {
+				const path = vPath.slice(0, -4);
 				return svg2sfc.convert(readFileSync(path, "utf8"), path);
 			}
 		},
