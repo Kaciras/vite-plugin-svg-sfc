@@ -15,6 +15,9 @@
 	],
 	"type": "module",
 	"exports": {
+		"./client": {
+			"types": "./client.d.ts"
+		},
 		".": {
 			"types": "./index.d.ts",
 			"import": "./index.js",
