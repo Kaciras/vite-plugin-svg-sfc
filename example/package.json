@@ -8,14 +8,14 @@
 		"build": "vite build"
 	},
 	"dependencies": {
-		"bootstrap-icons": "^1.10.4",
+		"bootstrap-icons": "^1.10.5",
 		"prismjs": "^1.29.0",
 		"vue": "^3.2.47"
 	},
 	"devDependencies": {
 		"@types/prismjs": "^1.26.0",
-		"@vitejs/plugin-vue": "^4.1.0",
-		"vite": "^4.3.1",
+		"@vitejs/plugin-vue": "^4.2.1",
+		"vite": "^4.3.3",
 		"vite-plugin-svg-sfc": "workspace:^"
 	}
 }
