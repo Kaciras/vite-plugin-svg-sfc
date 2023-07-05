@@ -5,10 +5,11 @@ export default defineConfig({
 	test: {
 		clearMocks: true,
 		coverage: {
+			provider: "v8",
 			reporter: ["lcov"],
 		},
 		include: [
-			"test/*.spec.ts", 
+			"test/*.spec.ts",
 			"test/rollup-test.ts",
 		],
 	},
