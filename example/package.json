@@ -15,7 +15,7 @@
 	"devDependencies": {
 		"@types/prismjs": "^1.26.0",
 		"@vitejs/plugin-vue": "^4.2.3",
-		"vite": "^4.4.4",
+		"vite": "^4.4.7",
 		"vite-plugin-svg-sfc": "workspace:^"
 	}
 }
