@@ -2,37 +2,43 @@ name: Deploy
 
 on:
   push:
-    branches:
-      - master
+    branches: [master]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
+      - uses: actions/checkout@v3
+
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
           node-version: latest
 
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - run: npm i -g pnpm
-
-      - run: pnpm install
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          run_install: true
 
       - run: pnpm run compile
 
-      - name: Build Example
-        run: pnpm run build
+      - run: pnpm run build
         working-directory: example
 
-      - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@v4
+      - uses: actions/upload-pages-artifact@v2
         with:
-          folder: example/dist
-          silent: true
-          clean: true
-          branch: gh-pages
-          single-commit: true
+          path: example/dist
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
