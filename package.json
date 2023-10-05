@@ -34,7 +34,7 @@
 		"client.d.ts"
 	],
 	"scripts": {
-		"compile": "tsc && node scripts/build-cjs.js",
+		"compile": "tsc --project tsconfig.lib.json && node scripts/build-cjs.js",
 		"test": "vitest run"
 	},
 	"dependencies": {
