@@ -35,7 +35,7 @@
 	],
 	"scripts": {
 		"compile": "tsc && node scripts/build-cjs.js",
-		"test": "vitest run --coverage"
+		"test": "vitest run"
 	},
 	"dependencies": {
 		"svgo": "^3.0.2"

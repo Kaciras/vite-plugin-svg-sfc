@@ -75,7 +75,7 @@ it("should support set minify in options", async () => {
 });
 
 it("should support custom mark", async () => {
-	const code = await convert("styles-0.svg?component", { 
+	const code = await convert("styles-0.svg?component", {
 		config: { mark: "component" },
 	});
 	expect(code).toMatchSnapshot();
@@ -177,5 +177,5 @@ it("should support HMR", async () => {
 	expect(style?.type).toBe("js-update");
 	expect(await getStyleCode()).contains("fill: red;");
 
-	await server.close();
+	// await server.close();
 });
