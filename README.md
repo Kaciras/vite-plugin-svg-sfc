@@ -61,6 +61,33 @@ If you are using TypeScript, `vite-plugin-svg-sfc/client` can be added to `d.ts`
 /// <reference types="vite-plugin-svg-sfc/client" />
 ```
 
+Build a component library:
+
+```javascript
+// index.js
+export { default as FooIcon } from "./icons/foo.svg?sfc";
+export { default as BarIcon } from "./icons/bar.svg?sfc";
+```
+
+```typescript
+import { defineConfig } from "vite";
+import svgSfc from "vite-plugin-svg-sfc";
+import vue from "@vitejs/plugin-vue";
+
+export default defineConfig({
+    plugins: [svgSfc(), vue()],
+    build: {
+        rollupOptions: {
+            external: "vue",
+        },
+        lib: {
+            formats: ["es"],
+            entry: "index.js",
+        },
+    },
+});
+```
+
 ### Without Vite
 
 `SVGSFCConvertor` is exported for convert SVG to SFC code without build tools.
