@@ -50,15 +50,15 @@ it("should change attributes", async () => {
 	expect(await convert("styles-0.svg?sfc")).toMatchSnapshot();
 });
 
-it("should change stroke attribute", async () => {
+it("should change the stroke attribute", async () => {
 	expect(await convert("stroke.svg?sfc")).toMatchSnapshot();
 });
 
-it("should remove processing instruction in dev", async () => {
+it("should remove processing instructions in dev", async () => {
 	expect(await convert("instruction.svg?sfc", { mode: "development" })).toMatchSnapshot();
 });
 
-it("should remove processing instruction in prod", async () => {
+it("should remove processing instructions in prod", async () => {
 	expect(await convert("instruction.svg?sfc")).toMatchSnapshot();
 });
 

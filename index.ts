@@ -388,7 +388,7 @@ export default function (options: SVGSFCPluginOptions = {}): VitePlugin {
 				id = path.slice(0, -4);
 			}
 
-			const r = await this.resolve(id, importer, { skipSelf: true });
+			const r = await this.resolve(id, importer);
 			if (!r) {
 				throw new Error("Cannot resolve file: " + id);
 			}

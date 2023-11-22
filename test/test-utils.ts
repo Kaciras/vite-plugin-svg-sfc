@@ -3,7 +3,7 @@ import { fileURLToPath } from "url";
 import { copyFileSync, mkdirSync, mkdtempSync, rmSync } from "fs";
 import { tmpdir } from "os";
 import { RollupOutput } from "rollup";
-import WebSocket from "ws";
+import { WebSocket } from "ws";
 import { build, Plugin, UpdatePayload, ViteDevServer } from "vite";
 import { afterEach, beforeEach, expect } from "vitest";
 import svgSfc, { SVGSFCPluginOptions } from "../index";
