@@ -16,7 +16,7 @@ import {
 	useTempDirectory,
 	ViteHMRClient,
 } from "./test-utils";
-import svgSfc from "../index.js";
+import svgSfc, { SVGSFCConvertor } from "../index.js";
 
 const input = "image.svg";
 const tmpDir = useTempDirectory(cwd());
@@ -108,13 +108,33 @@ it("should work with @vitejs/plugin-vue", async () => {
 	expect(await renderToString(app)).toMatchSnapshot();
 });
 
-it("should apply extractCSS plugin", async () => {
-	const code = await convert("styles-0.svg?sfc", {
+it("should support configure SVG plugins", () => {
+	const convertor = new SVGSFCConvertor({
+		svgo: {
+			plugins: [
+				{ name: "preset-default" },
+				{
+					name: "setSVGAttrs",
+					params: { foo: 11 },
+				},
+				{ name: "responsiveSVGAttrs" },
+			],
+		},
+	});
+	const resolved = (convertor as any).plugins;
+	expect(resolved).toHaveLength(3);
+	expect(resolved[0]).toStrictEqual({ name: "preset-default" });
+	expect(resolved[1].fn).toBeTypeOf("function");
+	expect(resolved[2].fn).toBeTypeOf("function");
+});
+
+it("should apply only extractCSS plugin",  () => {
+	const promise = convert("styles-0.svg?sfc", {
 		config: {
 			svgo: { plugins: ["extractCSS"] },
 		},
 	});
-	expect(code).toMatchSnapshot();
+	return expect(promise).resolves.toMatchSnapshot();
 });
 
 it("should change <svg>'s attributes with svgProps", async () => {
