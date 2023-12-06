@@ -6,7 +6,8 @@ export default defineConfig({
 		clearMocks: true,
 		coverage: {
 			provider: "v8",
-			reporter: ["lcovonly"],
+			all: false,
+			reporter: ["lcov"],
 		},
 		include: [
 			"test/*.spec.ts",
