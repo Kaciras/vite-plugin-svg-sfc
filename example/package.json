@@ -10,12 +10,12 @@
 	"dependencies": {
 		"bootstrap-icons": "^1.11.2",
 		"prismjs": "^1.29.0",
-		"vue": "^3.3.11"
+		"vue": "^3.3.13"
 	},
 	"devDependencies": {
 		"@types/prismjs": "^1.26.3",
 		"@vitejs/plugin-vue": "^4.5.2",
-		"vite": "^5.0.8",
+		"vite": "^5.0.10",
 		"vite-plugin-svg-sfc": "workspace:^"
 	}
 }
