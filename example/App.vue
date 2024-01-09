@@ -14,12 +14,35 @@
 	</div>
 	<section class='showcase'>
 		<header>
-			<h1>Responsive size and color</h1>
-			<p>Replaced attributes with reactive value:</p>
+			<h1>Optimized by default</h1>
+			<p>Replace attributes with reactive value:</p>
 			<ul>
-				<li>set width & height to "1em".</li>
-				<li>set fill and stroke to "currentColor" if it's not transparent.</li>
+				<li>
+					set
+					<span class='inline-code'>fill</span>
+					&
+					<span class='inline-code'>stroke</span>
+					to "currentColor" if it's not transparent.
+				</li>
+				<li>
+					set
+					<span class='inline-code'>width</span>
+					&
+					<span class='inline-code'>height</span>
+					to "1em".
+				</li>
 			</ul>
+			<p>
+				Remove
+				<span class='inline-code'>xmlns</span>,
+				<span class='inline-code'>version</span>,
+				and
+				<span class='inline-code'>xml:space</span>
+				attributes that redundant for inlined SVG.
+			</p>
+			<p>
+				These behaviors can be configured through options.
+			</p>
 		</header>
 		<div>
 			<form>
@@ -45,9 +68,10 @@
 		<header>
 			<h1>&lt;style&gt; support</h1>
 			<p>
-				vite-plugin-svg-sfc move &lt;style&gt; tags from SVG to SFC block,
-				you can use all the features of CSS including pseudo class,
-				media query, @keyframes etc...
+
+				vite-plugin-svg-sfc move <span class='inline-code'>&lt;style&gt;</span>
+				tags from SVG to SFC block, you can use all the features
+				of CSS including pseudo class, media query, @keyframes etc...
 			</p>
 		</header>
 	</section>
@@ -57,21 +81,21 @@
 			<p>vite-plugin-svg-sfc does not affect Vite default asset handling.</p>
 
 			<div class='import-grid'>
-				<span class='import'>./assets/gear.svg?sfc</span>
+				<span class='inline-code import'>./assets/gear.svg?sfc</span>
 				<span>(vue component)</span>
 				<GearIcon class='import-case'/>
 
-				<span class='import'>./assets/gear.svg</span>
+				<span class='inline-code import'>./assets/gear.svg</span>
 				<span>{{ ImportAsset }}</span>
 				<img class='import-case' :src='ImportAsset' alt='image'>
 
-				<span class='import'>./assets/gear.svg?url</span>
+				<span class='inline-code import'>./assets/gear.svg?url</span>
 				<span>{{ ImportUrl }}</span>
 				<img class='import-case' :src='ImportUrl' alt='image'>
 			</div>
 		</header>
 		<div>
-			<span class='import'>./assets/gear.svg?raw</span>
+			<span class='inline-code import'>./assets/gear.svg?raw</span>
 			<pre class='svg-xml language-svg'><code v-html='svgCode'></code></pre>
 		</div>
 	</section>
@@ -126,9 +150,13 @@ h1 {
 section {
 	display: flex;
 	justify-content: center;
-	gap: 12px;
+	gap: 40px;
 	margin: 0 auto;
 	padding: 40px 10px;
+}
+
+li {
+	margin: 1em 0;
 }
 
 label {
@@ -211,12 +239,19 @@ form {
 	align-items: center;
 }
 
-.import {
-	grid-column: 1/2;
-	padding: 6px;
+.inline-code {
+	padding: 4px 6px;
 	border-radius: 4px;
 	color: white;
 	background: #008856;
+}
+
+.import {
+	grid-column: 1/2;
+
+	& + span {
+		word-break: break-all;
+	}
 }
 
 .import-case {
