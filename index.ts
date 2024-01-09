@@ -90,11 +90,20 @@ export function extractCSS(styles: string[]) {
 	};
 }
 
-// Ensure the SVG has single root node.
 const essential: PluginConfig[] = [
+	// Ensure the SVG component has single root node.
 	"removeComments",
 	"removeDoctype",
 	"removeXMLProcInst",
+
+	setSVGAttrs(attrs => {
+		// https://stackoverflow.com/a/34249810
+		delete attrs.xmlns;
+		delete attrs.version;
+
+		// Deprecated & removed from the standards.
+		delete attrs["xml:space"];
+	}),
 ];
 
 type InternalPluginOptions = { name: "extractCSS" }
