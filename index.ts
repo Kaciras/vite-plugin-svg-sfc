@@ -23,9 +23,7 @@ function preItem(fn: (node: XastElement, info: PluginInfo) => void): PluginFn<vo
  */
 export const responsiveSVGAttrs: CustomPlugin = {
 	name: "responsiveSVGAttrs",
-	fn: preItem(node => {
-		const { name, attributes } = node;
-
+	fn: preItem(({ name, attributes }) => {
 		if (name === "svg") {
 			const { fill, stroke } = attributes;
 
@@ -48,13 +46,13 @@ export const responsiveSVGAttrs: CustomPlugin = {
  *
  * @param params The attributes to add to <svg>
  */
-export function setSVGAttrs(params: SVGPropsParam): CustomPlugin {
+export function modifySVGAttrs(params: SVGPropsParam): CustomPlugin {
 	const fn = typeof params === "function"
 		? params
 		: (attrs: any) => Object.assign(attrs, params);
 
 	return {
-		name: "setSVGAttrs",
+		name: "modifySVGAttrs",
 		fn: preItem((node, info) => {
 			const { name, attributes } = node;
 			const { path, multipassCount } = info;
@@ -96,7 +94,7 @@ const essential: PluginConfig[] = [
 	"removeDoctype",
 	"removeXMLProcInst",
 
-	setSVGAttrs(attrs => {
+	modifySVGAttrs(attrs => {
 		// https://stackoverflow.com/a/34249810
 		delete attrs.xmlns;
 		delete attrs.version;
@@ -108,7 +106,7 @@ const essential: PluginConfig[] = [
 
 type InternalPluginOptions = { name: "extractCSS" }
 	| { name: "responsiveSVGAttrs" }
-	| { name: "setSVGAttrs"; params?: SVGPropsParam };
+	| { name: "modifySVGAttrs"; params?: SVGPropsParam };
 
 type PluginEx = PluginConfig | InternalPluginOptions | InternalPluginOptions["name"]
 
@@ -165,7 +163,7 @@ export interface SVGSFCOptions {
 	 *             "extractCSS",
 	 *             "preset-default",
 	 *             {
-	 *                 name: "setSVGAttrs",
+	 *                 name: "modifySVGAttrs",
 	 *                 params: { foo: "bar" }
 	 *             }
 	 *         ]
@@ -224,8 +222,8 @@ export class SVGSFCConvertor {
 				case "responsiveSVGAttrs":
 					plugins.push(responsiveSVGAttrs);
 					break;
-				case "setSVGAttrs":
-					plugins.push(setSVGAttrs(params));
+				case "modifySVGAttrs":
+					plugins.push(modifySVGAttrs(params));
 					break;
 				default:
 					plugins.push(plugin as PluginConfig);
@@ -262,7 +260,7 @@ export class SVGSFCConvertor {
 		}
 
 		if (svgProps) {
-			plugins.push(setSVGAttrs(svgProps));
+			plugins.push(modifySVGAttrs(svgProps));
 		}
 
 		if (extractStyles) {
@@ -271,7 +269,7 @@ export class SVGSFCConvertor {
 		}
 
 		if (minify) {
-			// Ensure sortAttrs can handle new attributes added by setSVGAttrs.
+			// Ensure sortAttrs can handle new attributes added by modifySVGAttrs.
 			overrides.sortAttrs = false;
 			plugins.push("sortAttrs");
 

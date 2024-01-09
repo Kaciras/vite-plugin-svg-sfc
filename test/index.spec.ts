@@ -114,7 +114,7 @@ it("should support configure SVG plugins", () => {
 			plugins: [
 				{ name: "preset-default" },
 				{
-					name: "setSVGAttrs",
+					name: "modifySVGAttrs",
 					params: { foo: 11 },
 				},
 				{ name: "responsiveSVGAttrs" },

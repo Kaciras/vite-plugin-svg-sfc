@@ -179,7 +179,7 @@ svgSfc({
             "extractCSS",
             "preset-default",
             {
-                name: "setSVGAttrs",
+                name: "modifySVGAttrs",
                 params: { foo: "bar" }
             }
         ]
