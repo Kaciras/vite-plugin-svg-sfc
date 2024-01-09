@@ -167,7 +167,7 @@ Default: `{}`
 
 Specify the SVGO config to use, set to false to disable processing SVG data.
 
-If `svgo.plugins` is specified, the `extractStyles`, `minify`, `svgProps` and `responsive` options are ignored, you can add them manually:
+If `svgo.plugins` is specified, the `extractStyles`, `minify`, `svgProps`, `responsive` options and builtin plugins are ignored, you can add them manually:
 
 ```typescript
 import svgSfc from "vite-plugin-svg-sfc";
@@ -180,7 +180,11 @@ svgSfc({
             "preset-default",
             {
                 name: "modifySVGAttrs",
-                params: { foo: "bar" }
+                params(attrs) {
+					delete attrs.xmlns;
+					delete attrs.version;
+					delete attrs["xml:space"];
+                }
             }
         ]
     }

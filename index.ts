@@ -88,20 +88,11 @@ export function extractCSS(styles: string[]) {
 	};
 }
 
+// Ensure the SVG component has single root node.
 const essential: PluginConfig[] = [
-	// Ensure the SVG component has single root node.
 	"removeComments",
 	"removeDoctype",
 	"removeXMLProcInst",
-
-	modifySVGAttrs(attrs => {
-		// https://stackoverflow.com/a/34249810
-		delete attrs.xmlns;
-		delete attrs.version;
-
-		// Deprecated & removed from the standards.
-		delete attrs["xml:space"];
-	}),
 ];
 
 type InternalPluginOptions = { name: "extractCSS" }
@@ -150,8 +141,8 @@ export interface SVGSFCOptions {
 	/**
 	 * Specify SVGO config, set to false to disable processing SVG data.
 	 *
-	 * If `svgo.plugins` is specified, the `extractStyles`, `minify`,
-	 * `svgProps` and `responsive` options are ignored, you can add them manually:
+	 * If `svgo.plugins` is specified, the `extractStyles`, `minify`, `svgProps`,
+	 * `responsive` options and builtin plugins are ignored, you can add them manually:
 	 *
 	 * @example
 	 * import svgSfc from "vite-plugin-svg-sfc";
@@ -164,7 +155,11 @@ export interface SVGSFCOptions {
 	 *             "preset-default",
 	 *             {
 	 *                 name: "modifySVGAttrs",
-	 *                 params: { foo: "bar" }
+	 *                 params(attrs) {
+	 * 	                   delete attrs.xmlns;
+	 * 	                   delete attrs.version;
+	 * 	                   delete attrs["xml:space"];
+	 *                 }
 	 *             }
 	 *         ]
 	 *     }
@@ -258,6 +253,15 @@ export class SVGSFCConvertor {
 		} else {
 			plugins.push(...essential);
 		}
+
+		plugins.push(modifySVGAttrs(attrs => {
+			// https://stackoverflow.com/a/34249810
+			delete attrs.xmlns;
+			delete attrs.version;
+
+			// Deprecated & removed from the standards.
+			delete attrs["xml:space"];
+		}));
 
 		if (svgProps) {
 			plugins.push(modifySVGAttrs(svgProps));
