@@ -48,7 +48,7 @@ export const responsiveSVGAttrs: CustomPlugin = {
  *
  * @param params The attributes to add to <svg>
  */
-function setSVGAttrs(params: SVGPropsParam): CustomPlugin {
+export function setSVGAttrs(params: SVGPropsParam): CustomPlugin {
 	const fn = typeof params === "function"
 		? params
 		: (attrs: any) => Object.assign(attrs, params);
