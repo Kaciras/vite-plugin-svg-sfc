@@ -181,9 +181,9 @@ svgSfc({
             {
                 name: "modifySVGAttrs",
                 params(attrs) {
-					delete attrs.xmlns;
-					delete attrs.version;
-					delete attrs["xml:space"];
+                    delete attrs.xmlns;
+                    delete attrs.version;
+                    delete attrs["xml:space"];
                 }
             }
         ]
