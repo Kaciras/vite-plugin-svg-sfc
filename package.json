@@ -38,7 +38,7 @@
 		"test": "vitest run"
 	},
 	"dependencies": {
-		"svgo": "^3.1.0"
+		"svgo": "^3.2.0"
 	},
 	"devDependencies": {
 		"@kaciras/eslint-config-core": "^2.6.3",
@@ -47,13 +47,13 @@
 		"@types/node": "^20.10.6",
 		"@types/ws": "^8.5.10",
 		"@vitejs/plugin-vue": "^5.0.2",
-		"@vitest/coverage-v8": "^1.1.0",
+		"@vitest/coverage-v8": "^1.1.3",
 		"eslint": "^8.56.0",
-		"rollup": "^4.9.2",
+		"rollup": "^4.9.4",
 		"typescript": "^5.3.3",
-		"vite": "^5.0.10",
-		"vitest": "^1.1.0",
-		"vue": "^3.4.3",
+		"vite": "^5.0.11",
+		"vitest": "^1.1.3",
+		"vue": "^3.4.5",
 		"ws": "^8.16.0"
 	}
 }
