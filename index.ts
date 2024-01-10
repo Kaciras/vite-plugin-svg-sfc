@@ -7,8 +7,8 @@ import { Config, CustomPlugin, optimize, PluginConfig } from "svgo";
  * Called on each svg root element, modify the attrs in place.
  *
  * @param attrs Attributes of the <svg> element.
- * @param path absolute file path
- * @param passes multipass count
+ * @param path absolute file path.
+ * @param passes current pass count.
  */
 export type ModifySVGProps = (attrs: Record<string, any>, path: string, passes: number) => void;
 
@@ -19,7 +19,10 @@ function preItem(fn: (node: XastElement, info: PluginInfo) => void): PluginFn<vo
 }
 
 /**
- * The SVGO plugin used when `responsive` is true.
+ * Replace attributes with reactive value, used when `responsive` is true.
+ *
+ * If you prefer to control the size with CSS,
+ * you can use modifySVGAttrs plugin to remove `width` & `height`.
  */
 export const responsiveSVGAttrs: CustomPlugin = {
 	name: "responsiveSVGAttrs",
@@ -39,12 +42,12 @@ export const responsiveSVGAttrs: CustomPlugin = {
 };
 
 /**
- * The SVGO plugin for `svgProps` option.
+ * Modify attributes of the outer most <svg> element, used by `svgProps` option.
  *
  * SVGO has a addAttributesToSVGElement plugin similar to this,
  * but it cannot override existing attributes.
  *
- * @param params The attributes to add to <svg>
+ * @param params Attributes to add to <svg>, or a function to modify attributes.
  */
 export function modifySVGAttrs(params: SVGPropsParam): CustomPlugin {
 	const fn = typeof params === "function"
@@ -95,11 +98,11 @@ const essential: PluginConfig[] = [
 	"removeXMLProcInst",
 ];
 
-type InternalPluginOptions = { name: "extractCSS" }
+type PluginConfigEx = { name: "extractCSS" }
 	| { name: "responsiveSVGAttrs" }
 	| { name: "modifySVGAttrs"; params?: SVGPropsParam };
 
-type PluginEx = PluginConfig | InternalPluginOptions | InternalPluginOptions["name"]
+type PluginEx = PluginConfig | PluginConfigEx | PluginConfigEx["name"]
 
 export interface SVGOptions extends Omit<Config, "plugins"> {
 	plugins?: PluginEx[];
@@ -287,7 +290,7 @@ export class SVGSFCConvertor {
 	 * Convert the SVG XML to Vue SFC code.
 	 *
 	 * @param svg the SVG code.
-	 * @param path The path of the SVG file, can be used by plugins.
+	 * @param path The path of the SVG file, used by plugins.
 	 */
 	convert(svg: string, path?: string) {
 		const { styles, plugins, svgo } = this;
@@ -341,7 +344,9 @@ export default function (options: SVGSFCPluginOptions = {}): VitePlugin {
 	return {
 		name: "vite-plugin-svg-sfc",
 
-		// This plugin must run before vite:asset and other plugins that process .vue files.
+		/**
+		 * This plugin must run before vite:asset and other plugins that process .vue files.
+		 */
 		enforce: "pre",
 
 		configResolved({ mode }) {
@@ -374,7 +379,7 @@ export default function (options: SVGSFCPluginOptions = {}): VitePlugin {
 		},
 
 		/**
-		 * Resolve "*.svg?sfc" import to a virtual .vue file.
+		 * Resolve "*.svg?<mark>" import to a virtual .vue file.
 		 * e.g. "./image.svg?sfc" -> "/path/to/image.svg.vue?sfc"
 		 *
 		 * About the suffix:

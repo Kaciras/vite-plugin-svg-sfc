@@ -196,6 +196,4 @@ it("should support HMR", async () => {
 	const style = updates.find(e => e.path === styleUrl);
 	expect(style?.type).toBe("js-update");
 	expect(await getStyleCode()).contains("fill: red;");
-
-	// await server.close();
 });
