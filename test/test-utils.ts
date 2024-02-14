@@ -1,5 +1,4 @@
-import { basename, dirname, join } from "path";
-import { fileURLToPath } from "url";
+import { basename, join } from "path";
 import { copyFileSync, mkdirSync, mkdtempSync, rmSync } from "fs";
 import { tmpdir } from "os";
 import { RollupOutput } from "rollup";
@@ -7,8 +6,6 @@ import { WebSocket } from "ws";
 import { build, Plugin, UpdatePayload, ViteDevServer } from "vite";
 import { afterEach, beforeEach, expect } from "vitest";
 import svgSfc, { SVGSFCPluginOptions } from "../index";
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export const extractSFCPlugin: Plugin = {
 	name: "test:extract-sfc",
@@ -87,7 +84,7 @@ export function useTempDirectory(parent = tmpdir()) {
 }
 
 export function resolveFixture(name: string) {
-	return join(__dirname, "fixtures", name);
+	return join("test/fixtures", name);
 }
 
 export function copyFixture(name: string, dist: string) {

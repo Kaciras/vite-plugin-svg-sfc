@@ -1,5 +1,5 @@
 import { cwd } from "process";
-import { basename, join } from "path";
+import { basename, join, resolve } from "path";
 import { readFileSync, writeFileSync } from "fs";
 import { expect, it } from "vitest";
 import { build, createServer } from "vite";
@@ -43,7 +43,7 @@ it("should keep query in the URL", async () => {
 	const bundle = await compile("stroke.svg?foo=1&sfc&bar");
 	const absPath = resolveFixture("stroke.svg").replaceAll("\\", "/");
 	expect(bundle.output[0].facadeModuleId)
-		.toBe(absPath + ".vue?foo=1&sfc&bar");
+		.toBe(resolve(absPath) + ".vue?foo=1&sfc&bar");
 });
 
 it("should change attributes", async () => {
@@ -128,7 +128,7 @@ it("should support configure SVG plugins", () => {
 	expect(resolved[2].fn).toBeTypeOf("function");
 });
 
-it("should apply only extractCSS plugin",  () => {
+it("should apply only extractCSS plugin", () => {
 	const promise = convert("styles-0.svg?sfc", {
 		config: {
 			svgo: { plugins: ["extractCSS"] },
