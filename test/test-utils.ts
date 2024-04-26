@@ -2,7 +2,6 @@ import { basename, join } from "path";
 import { copyFileSync, mkdirSync, mkdtempSync, rmSync } from "fs";
 import { tmpdir } from "os";
 import { RollupOutput } from "rollup";
-import { WebSocket } from "ws";
 import { build, Plugin, UpdatePayload, ViteDevServer } from "vite";
 import { afterEach, beforeEach, expect } from "vitest";
 import svgSfc, { SVGSFCPluginOptions } from "../index";
@@ -102,6 +101,6 @@ export class ViteHMRClient {
 	}
 
 	receive(): Promise<UpdatePayload> {
-		return new Promise<string>(resolve => this.ws.once("message", resolve)).then(JSON.parse);
+		return new Promise<string>(resolve => this.ws.onmessage = e => resolve(e.data)).then(JSON.parse);
 	}
 }

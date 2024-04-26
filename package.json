@@ -45,7 +45,6 @@
 		"@kaciras/eslint-config-typescript": "^3.0.1",
 		"@kaciras/eslint-config-vue": "^3.0.1",
 		"@types/node": "^20.12.7",
-		"@types/ws": "^8.5.10",
 		"@vitejs/plugin-vue": "^5.0.4",
 		"@vitest/coverage-v8": "^1.5.0",
 		"eslint": "^9.1.0",
@@ -53,7 +52,6 @@
 		"typescript": "^5.4.5",
 		"vite": "^5.2.10",
 		"vitest": "^1.5.0",
-		"vue": "^3.4.23",
-		"ws": "^8.16.0"
+		"vue": "^3.4.23"
 	}
 }
