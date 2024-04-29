@@ -10,7 +10,7 @@
 	"dependencies": {
 		"bootstrap-icons": "^1.11.3",
 		"prismjs": "^1.29.0",
-		"vue": "^3.4.23"
+		"vue": "^3.4.25"
 	},
 	"devDependencies": {
 		"@types/prismjs": "^1.26.3",
