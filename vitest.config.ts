@@ -2,11 +2,11 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
 	test: {
-		clearMocks: true,
+		restoreMocks: true,
 		coverage: {
 			provider: "v8",
 			all: false,
-			reporter: ["lcov"],
+			reporter: ["lcovonly"],
 		},
 		include: [
 			"test/*.spec.ts",
