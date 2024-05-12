@@ -20,21 +20,16 @@
 		},
 		".": {
 			"types": "./index.d.ts",
-			"import": "./index.js",
-			"require": "./index.cjs"
+			"import": "./index.js"
 		}
 	},
-	"module": "index.js",
-	"main": "index.cjs",
-	"types": "index.d.ts",
 	"files": [
 		"index.d.ts",
-		"index.cjs",
 		"index.js",
 		"client.d.ts"
 	],
 	"scripts": {
-		"compile": "tsc --project tsconfig.lib.json && node scripts/build-cjs.js",
+		"compile": "tsc --project tsconfig.lib.json",
 		"test": "vitest run"
 	},
 	"dependencies": {
