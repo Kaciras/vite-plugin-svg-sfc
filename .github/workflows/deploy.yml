@@ -29,8 +29,6 @@ jobs:
           version: latest
           run_install: true
 
-      - run: pnpm run compile
-
       - run: pnpm run build
         working-directory: example
 

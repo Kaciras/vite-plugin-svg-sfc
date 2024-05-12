@@ -6,6 +6,7 @@
 		"moduleResolution": "Node",
 		"strict": true,
 		"skipLibCheck": true,
-		"useUnknownInCatchVariables": false
+		"useUnknownInCatchVariables": false,
+		"allowImportingTsExtensions": true
 	}
 }

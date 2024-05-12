@@ -15,8 +15,8 @@ import {
 	TestOptions,
 	useTempDirectory,
 	ViteHMRClient,
-} from "./test-utils";
-import svgSfc, { SVGSFCConvertor } from "../index.js";
+} from "./test-utils.ts";
+import svgSfc, { SVGSFCConvertor } from "../index.ts";
 
 const input = "image.svg";
 const tmpDir = useTempDirectory(cwd());

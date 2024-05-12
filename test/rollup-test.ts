@@ -1,7 +1,7 @@
 import { expect, it } from "vitest";
 import { OutputAsset, OutputChunk, rollup } from "rollup";
-import { extractSFCPlugin, resolveFixture } from "./test-utils";
-import svgSfc from "../index";
+import { extractSFCPlugin, resolveFixture } from "./test-utils.ts";
+import svgSfc from "../index.ts";
 
 it("should work with rollup", async () => {
 	const build = await rollup({

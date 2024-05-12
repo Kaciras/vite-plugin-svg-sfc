@@ -4,7 +4,7 @@ import { tmpdir } from "os";
 import { RollupOutput } from "rollup";
 import { build, Plugin, UpdatePayload, ViteDevServer } from "vite";
 import { afterEach, beforeEach, expect } from "vitest";
-import svgSfc, { SVGSFCPluginOptions } from "../index";
+import svgSfc, { SVGSFCPluginOptions } from "../index.ts";
 
 export const extractSFCPlugin: Plugin = {
 	name: "test:extract-sfc",

@@ -70,9 +70,6 @@ importers:
       vite:
         specifier: ^5.2.11
         version: 5.2.11(@types/node@20.12.10)
-      vite-plugin-svg-sfc:
-        specifier: workspace:^
-        version: link:..
 
 packages:
 
