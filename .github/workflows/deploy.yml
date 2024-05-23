@@ -29,11 +29,11 @@ jobs:
           run_install: true
 
       - run: pnpm run build
-        working-directory: example
+        working-directory: demo
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: example/dist
+          path: demo/dist
 
       - name: Deploy to GitHub Pages
         id: deployment

@@ -49,7 +49,7 @@ importers:
         specifier: ^3.4.27
         version: 3.4.27(typescript@5.4.5)
 
-  example:
+  demo:
     dependencies:
       bootstrap-icons:
         specifier: ^1.11.3

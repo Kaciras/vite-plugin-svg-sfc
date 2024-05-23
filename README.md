@@ -6,7 +6,7 @@
 
 Vite (also support Rollup) plugin to convert SVGs to Vue single file components (SFC).
 
-[example](https://kaciras.github.io/vite-plugin-svg-sfc/)
+[Demo](https://kaciras.github.io/vite-plugin-svg-sfc/)
 
 🚀 Features
 
