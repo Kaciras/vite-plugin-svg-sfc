@@ -8,9 +8,6 @@ export default defineConfig({
 			all: false,
 			reporter: ["lcovonly"],
 		},
-		include: [
-			"test/*.spec.ts",
-			"test/rollup-test.ts",
-		],
+		include: ["test/*-test.ts"],
 	},
 });

@@ -1,27 +1,17 @@
 import { cwd } from "process";
-import { basename, join, resolve } from "path";
-import { readFileSync, writeFileSync } from "fs";
+import { join, resolve } from "path";
+import { writeFileSync } from "fs";
 import { expect, it } from "vitest";
 import { build, createServer } from "vite";
 import { RollupOutput } from "rollup";
 import vue from "@vitejs/plugin-vue";
 import { createApp } from "vue";
 import { renderToString } from "vue/server-renderer";
-import {
-	compile,
-	convert,
-	copyFixture,
-	createHMRClient,
-	resolveFixture,
-	TestOptions,
-	useTempDirectory,
-} from "./test-utils.ts";
-import svgSfc, { SVGSFCConvertor } from "../index.ts";
+import { compile, convert, copyFixture, createHMRClient, resolveFixture, useTempDirectory } from "./test-helper.ts";
+import svgSfc from "../index.ts";
 
 const input = "image.svg";
 const tmpDir = useTempDirectory(cwd());
-
-const strokeSVG = readFileSync(resolveFixture("stroke.svg"), "utf8");
 
 async function loadBundle<T = any>(code: string) {
 	const file = join(tmpDir, "test.js");
@@ -46,22 +36,6 @@ it("should keep query in the URL", async () => {
 		.toBe(resolve(absPath) + ".vue?foo=1&sfc&bar");
 });
 
-it("should change attributes", async () => {
-	expect(await convert("styles-0.svg?sfc")).toMatchSnapshot();
-});
-
-it("should change the stroke attribute", async () => {
-	expect(await convert("stroke.svg?sfc")).toMatchSnapshot();
-});
-
-it("should remove processing instructions in dev", async () => {
-	expect(await convert("instruction.svg?sfc", { mode: "development" })).toMatchSnapshot();
-});
-
-it("should remove processing instructions in prod", async () => {
-	expect(await convert("instruction.svg?sfc")).toMatchSnapshot();
-});
-
 it("should not minify on dev mode", async () => {
 	expect(await convert("stroke.svg?sfc", { mode: "development" })).toMatchSnapshot();
 });
@@ -81,17 +55,6 @@ it("should support custom mark", async () => {
 	expect(code).toMatchSnapshot();
 });
 
-it("should extract styles", async () => {
-	const code = await convert("styles-0.svg?sfc");
-	expect(code.toString()).toMatchSnapshot();
-});
-
-it("should not process SVG if svgo option is false", async () => {
-	const config = { svgo: false } as const;
-	const code = await convert("stroke.svg?sfc", { config });
-	expect(code).toBe(`<template>${strokeSVG}</template>`);
-});
-
 it("should work with @vitejs/plugin-vue", async () => {
 	const bundle = await build({
 		logLevel: "silent",
@@ -106,59 +69,6 @@ it("should work with @vitejs/plugin-vue", async () => {
 	const component = await loadBundle(code);
 	const app = createApp(component, { width: 4396 });
 	expect(await renderToString(app)).toMatchSnapshot();
-});
-
-it("should support configure SVG plugins", () => {
-	const convertor = new SVGSFCConvertor({
-		svgo: {
-			plugins: [
-				{ name: "preset-default" },
-				{
-					name: "modifySVGAttrs",
-					params: { foo: 11 },
-				},
-				{ name: "responsiveSVGAttrs" },
-			],
-		},
-	});
-	const resolved = (convertor as any).plugins;
-	expect(resolved).toHaveLength(3);
-	expect(resolved[0]).toStrictEqual({ name: "preset-default" });
-	expect(resolved[1].fn).toBeTypeOf("function");
-	expect(resolved[2].fn).toBeTypeOf("function");
-});
-
-it("should apply only extractCSS plugin", () => {
-	const promise = convert("styles-0.svg?sfc", {
-		config: {
-			svgo: { plugins: ["extractCSS"] },
-		},
-	});
-	return expect(promise).resolves.toMatchSnapshot();
-});
-
-it("should change <svg>'s attributes with svgProps", async () => {
-	const config: TestOptions = {
-		config: {
-			svgProps: {
-				":data-foo": "1",	// Add new
-				viewBox: "0 0 5 5",	// Replace
-			},
-		},
-	};
-	expect(await convert("styles-0.svg?sfc", config)).toMatchSnapshot();
-});
-
-it("should change <svg>'s attributes with custom function", async () => {
-	const config: TestOptions = {
-		config: {
-			svgProps(attrs, path, passes) {
-				attrs.path = basename(path);
-				attrs.passes = passes;
-			},
-		},
-	};
-	expect(await convert("styles-0.svg?sfc", config)).toMatchSnapshot();
 });
 
 it("should support HMR", async () => {
