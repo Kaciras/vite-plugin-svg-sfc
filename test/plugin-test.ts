@@ -10,7 +10,6 @@ import { renderToString } from "vue/server-renderer";
 import { compile, convert, copyFixture, createHMRClient, resolveFixture, useTempDirectory } from "./test-helper.ts";
 import svgSfc from "../index.ts";
 
-const input = "image.svg";
 const tmpDir = useTempDirectory(cwd());
 
 async function loadBundle<T = any>(code: string) {
@@ -19,25 +18,22 @@ async function loadBundle<T = any>(code: string) {
 	return (await import("file://" + file)).default as T;
 }
 
-it("should throw on non-SVG data", async () => {
-	const build = convert("png-data.svg?sfc");
-	await expect(build).rejects.toThrow();
+it("should throw on non-SVG data", () => {
+	return expect(convert("png-data.svg?sfc")).rejects.toThrow(/Could not load/);
 });
 
-it("should throw on non-exists file", async () => {
-	const build = convert("not exists.svg?sfc");
-	await expect(build).rejects.toThrow();
+it("should throw on non-exists file", () => {
+	return expect(convert("not exists.svg?sfc")).rejects.toThrow(/Cannot resolve file/);
 });
 
 it("should keep query in the URL", async () => {
 	const bundle = await compile("stroke.svg?foo=1&sfc&bar");
-	const absPath = resolveFixture("stroke.svg").replaceAll("\\", "/");
-	expect(bundle.output[0].facadeModuleId)
-		.toBe(resolve(absPath) + ".vue?foo=1&sfc&bar");
+	const absPath = resolveFixture("stroke.svg");
+	expect(bundle.output[0].facadeModuleId).toBe(resolve(absPath) + ".vue?foo=1&sfc&bar");
 });
 
-it("should not minify on dev mode", async () => {
-	expect(await convert("stroke.svg?sfc", { mode: "development" })).toMatchSnapshot();
+it("should not minify on dev mode", () => {
+	return expect(convert("stroke.svg?sfc", { mode: "development" })).resolves.toMatchSnapshot();
 });
 
 it("should support set minify in options", async () => {
@@ -73,7 +69,7 @@ it("should work with @vitejs/plugin-vue", async () => {
 
 it("should support HMR", async () => {
 	const filename = join(tmpDir, "image.svg");
-	const mainUrl = `/${input}?sfc`;
+	const mainUrl = "/image.svg?sfc";
 	const styleUrl = `/${filename}.vue?vue&type=style&index=0&scoped=true&lang.css`;
 
 	copyFixture("styles-0.svg", filename);
@@ -83,7 +79,7 @@ it("should support HMR", async () => {
 		root: tmpDir,
 		build: {
 			rollupOptions: {
-				input: input + "?sfc",
+				input: "image.svg?sfc",
 			},
 		},
 		plugins: [svgSfc(), vue()],

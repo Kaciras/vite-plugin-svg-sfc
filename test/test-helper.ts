@@ -27,10 +27,10 @@ export interface TestOptions {
 	config?: SVGSFCPluginOptions;
 }
 
-export async function compile(fixture: string, options: TestOptions = {}) {
+export function compile(fixture: string, options: TestOptions = {}) {
 	const { mode, config } = options;
 
-	return <RollupOutput>await build({
+	return <Promise<RollupOutput>>build({
 		logLevel: "silent",
 		mode,
 		build: {
@@ -38,7 +38,7 @@ export async function compile(fixture: string, options: TestOptions = {}) {
 			rollupOptions: {
 				input: resolveFixture(fixture),
 
-				// Remove hash from file name.
+				// Remove hash from file names.
 				output: {
 					entryFileNames: "[name].js",
 					chunkFileNames: "[name].js",
@@ -83,7 +83,7 @@ export function useTempDirectory(parent = tmpdir()) {
 }
 
 export function resolveFixture(name: string) {
-	return join("test/fixtures", name);
+	return `test/fixtures/${name}`;
 }
 
 export function copyFixture(name: string, dist: string) {

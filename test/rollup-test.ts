@@ -5,6 +5,7 @@ import svgSfc from "../index.ts";
 
 it("should work with rollup", async () => {
 	const build = await rollup({
+		logLevel: "silent",
 		input: resolveFixture("instruction.svg?sfc"),
 		plugins: [svgSfc(), extractSFCPlugin],
 	});
