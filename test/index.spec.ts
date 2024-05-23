@@ -11,10 +11,10 @@ import {
 	compile,
 	convert,
 	copyFixture,
+	createHMRClient,
 	resolveFixture,
 	TestOptions,
 	useTempDirectory,
-	ViteHMRClient,
 } from "./test-utils.ts";
 import svgSfc, { SVGSFCConvertor } from "../index.ts";
 
@@ -185,11 +185,11 @@ it("should support HMR", async () => {
 	}
 
 	await server.listen();
-	const client = new ViteHMRClient(server);
+	const receiveUpdate = createHMRClient(server);
 
 	expect(await getStyleCode()).contains("fill: blue;");
 
-	const waitForHMR = client.receive();
+	const waitForHMR = receiveUpdate();
 	copyFixture("styles-1.svg", filename);
 	const { updates } = await waitForHMR;
 

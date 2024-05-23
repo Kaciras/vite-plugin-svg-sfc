@@ -90,17 +90,13 @@ export function copyFixture(name: string, dist: string) {
 	copyFileSync(resolveFixture(name), dist);
 }
 
-export class ViteHMRClient {
+export function createHMRClient(server: ViteDevServer) {
+	const { port } = server.config.server;
+	const ws = new WebSocket(`ws://localhost:${port}`, "vite-hmr");
+	server.hot.on("close", () => ws.close());
 
-	private readonly ws: WebSocket;
-
-	constructor(server: ViteDevServer) {
-		const { port } = server.config.server;
-		this.ws = new WebSocket(`ws://localhost:${port}`, "vite-hmr");
-		server.hot.on("close", () => this.ws.close());
-	}
-
-	receive(): Promise<UpdatePayload> {
-		return new Promise<string>(resolve => this.ws.onmessage = e => resolve(e.data)).then(JSON.parse);
-	}
+	return () => new Promise<UpdatePayload>((resolve, reject) => {
+		ws.onerror = reject;
+		ws.onmessage = event => resolve(JSON.parse(event.data));
+	});
 }
