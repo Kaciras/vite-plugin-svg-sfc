@@ -11,8 +11,9 @@ Vite (also support Rollup) plugin to convert SVGs to Vue single file components 
 🚀 Features
 
 * Extract `<style>` tags from SVG to scoped SFC style block.
-* Hot Module Replacement support.
-* Minification with [SVGO](https://github.com/svg/svgo).
+* Support Hot Module Replacement.
+* Support custom import mark.
+* [SVGO](https://github.com/svg/svgo) minification with sensible defaults.
 
 ## Usage
 
@@ -66,11 +67,11 @@ You can add more than one of this plugin with different marks.
 ```javascript
 export default defineConfig({
     plugins: [
-		vue(),
+        vue(),
         // matches *.svg?icon
-		svgSfc({ mark: "icon", svgProps: { class: "icon" } }),
+        svgSfc({ mark: "icon", svgProps: { class: "icon" } }),
         // matches *.svg?img
-		svgSfc({ mark: "img", responsive: false }),
+        svgSfc({ mark: "img", responsive: false }),
     ],
 });
 ```
