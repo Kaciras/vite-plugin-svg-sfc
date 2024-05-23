@@ -61,6 +61,20 @@ If you are using TypeScript, `vite-plugin-svg-sfc/client` can be added to `d.ts`
 /// <reference types="vite-plugin-svg-sfc/client" />
 ```
 
+You can add more than one of this plugin with different marks.
+
+```javascript
+export default defineConfig({
+    plugins: [
+		vue(),
+        // matches *.svg?icon
+		svgSfc({ mark: "icon", svgProps: { class: "icon" } }),
+        // matches *.svg?img
+		svgSfc({ mark: "img", responsive: false }),
+    ],
+});
+```
+
 Build a component library:
 
 ```javascript

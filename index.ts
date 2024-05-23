@@ -109,7 +109,6 @@ export interface SVGOptions extends Omit<Config, "plugins"> {
 }
 
 export interface SVGSFCOptions {
-
 	/**
 	 * When set to true, extract all style elements in the svg and put
 	 * their content into a scoped SFC style block.
@@ -311,7 +310,6 @@ export class SVGSFCConvertor {
 }
 
 export interface SVGSFCPluginOptions extends SVGSFCOptions {
-
 	/**
 	 * SVG will be imported as SFC using the query parameter.
 	 *
