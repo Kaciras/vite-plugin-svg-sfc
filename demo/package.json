@@ -9,11 +9,11 @@
 	"dependencies": {
 		"bootstrap-icons": "^1.11.3",
 		"prismjs": "^1.29.0",
-		"vue": "^3.4.27"
+		"vue": "^3.4.29"
 	},
 	"devDependencies": {
 		"@types/prismjs": "^1.26.4",
 		"@vitejs/plugin-vue": "^5.0.5",
-		"vite": "^5.2.13"
+		"vite": "^5.3.1"
 	}
 }
