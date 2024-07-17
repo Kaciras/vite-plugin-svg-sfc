@@ -36,17 +36,17 @@
 		"svgo": "^3.3.2"
 	},
 	"devDependencies": {
-		"@kaciras/eslint-config-core": "^3.0.3",
-		"@kaciras/eslint-config-typescript": "^3.0.3",
-		"@kaciras/eslint-config-vue": "^3.0.3",
-		"@types/node": "^20.14.10",
+		"@kaciras/eslint-config-core": "^3.1.0",
+		"@kaciras/eslint-config-typescript": "^3.1.0",
+		"@kaciras/eslint-config-vue": "^3.1.0",
+		"@types/node": "^20.14.11",
 		"@vitejs/plugin-vue": "^5.0.5",
-		"@vitest/coverage-v8": "^2.0.2",
-		"eslint": "^9.6.0",
+		"@vitest/coverage-v8": "^2.0.3",
+		"eslint": "^9.7.0",
 		"rollup": "^4.18.1",
 		"typescript": "^5.5.3",
-		"vite": "^5.3.3",
-		"vitest": "^2.0.2",
-		"vue": "^3.4.31"
+		"vite": "^5.3.4",
+		"vitest": "^2.0.3",
+		"vue": "^3.4.32"
 	}
 }
