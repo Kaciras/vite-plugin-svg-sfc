@@ -2,7 +2,7 @@ import { basename, join } from "path";
 import { copyFileSync, mkdirSync, mkdtempSync, rmSync } from "fs";
 import { tmpdir } from "os";
 import { RollupOutput } from "rollup";
-import { build, Plugin, UpdatePayload, ViteDevServer } from "vite";
+import { build, HotPayload, Plugin, ViteDevServer } from "vite";
 import { afterEach, beforeEach, expect } from "vitest";
 import svgSfc, { SVGSFCPluginOptions } from "../index.ts";
 
@@ -90,13 +90,37 @@ export function copyFixture(name: string, dist: string) {
 	copyFileSync(resolveFixture(name), dist);
 }
 
-export function createHMRClient(server: ViteDevServer) {
+export interface TestHMRWatcher {
+	events: HotPayload[];
+	ws: WebSocket;
+	waitForNth(value: number): Promise<HotPayload>;
+}
+
+export function createHMRWatcher(server: ViteDevServer) {
 	const { port } = server.config.server;
 	const ws = new WebSocket(`ws://localhost:${port}`, "vite-hmr");
-	server.hot.on("close", () => ws.close());
+	const events: HotPayload[] = [];
 
-	return () => new Promise<UpdatePayload>((resolve, reject) => {
-		ws.onerror = reject;
-		ws.onmessage = event => resolve(JSON.parse(event.data));
+	server.hot.on("close", () => ws.close());
+	ws.addEventListener("message", e => {
+		events.push(JSON.parse(e.data));
 	});
+
+	function waitForNth(value: number) {
+		if (events.length > value) {
+			return Promise.resolve(events[value]);
+		}
+		return new Promise<HotPayload>((resolve, reject) => {
+			const handler = () => {
+				if (events.length > value) {
+					resolve(events[value]);
+					ws.removeEventListener("message", handler);
+				}
+			};
+			ws.onerror = reject;
+			ws.addEventListener("message", handler);
+		});
+	}
+
+	return { ws, events, waitForNth } as TestHMRWatcher;
 }

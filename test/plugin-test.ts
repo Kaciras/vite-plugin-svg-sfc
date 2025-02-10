@@ -2,12 +2,12 @@ import { cwd } from "process";
 import { join, resolve } from "path";
 import { writeFileSync } from "fs";
 import { expect, it } from "vitest";
-import { build, createServer } from "vite";
+import { build, createServer, UpdatePayload } from "vite";
 import { RollupOutput } from "rollup";
 import vue from "@vitejs/plugin-vue";
 import { createApp } from "vue";
 import { renderToString } from "vue/server-renderer";
-import { compile, convert, copyFixture, createHMRClient, resolveFixture, useTempDirectory } from "./test-helper.ts";
+import { compile, convert, copyFixture, createHMRWatcher, resolveFixture, useTempDirectory } from "./test-helper.ts";
 import svgSfc from "../index.ts";
 
 const tmpDir = useTempDirectory(cwd());
@@ -91,13 +91,12 @@ it("should support HMR", async () => {
 	}
 
 	await server.listen();
-	const receiveUpdate = createHMRClient(server);
+	const watcher = createHMRWatcher(server);
 
 	expect(await getStyleCode()).contains("fill: blue;");
-
-	const waitForHMR = receiveUpdate();
 	copyFixture("styles-1.svg", filename);
-	const { updates } = await waitForHMR;
+
+	const { updates } = await watcher.waitForNth(2) as UpdatePayload;
 
 	const style = updates.find(e => e.path === styleUrl);
 	expect(style?.type).toBe("js-update");
