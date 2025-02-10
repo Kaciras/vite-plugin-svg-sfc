@@ -42,7 +42,7 @@ export const responsiveSVGAttrs: CustomPlugin = {
 };
 
 /**
- * Modify attributes of the outer most <svg> element, used by `svgProps` option.
+ * Modify attributes of the outermost <svg> element, used by `svgProps` option.
  *
  * SVGO has a addAttributesToSVGElement plugin similar to this,
  * but it cannot override existing attributes.
