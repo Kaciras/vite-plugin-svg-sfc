@@ -67,6 +67,71 @@ export function modifySVGAttrs(params: SVGPropsParam): CustomPlugin {
 	};
 }
 
+function dynamicId(idMap: Map<string, string>): CustomPlugin {
+	return {
+		name: "dynamicId",
+		fn: (_, __) => ({
+			element: {
+				enter(node) {
+					const { name, attributes } = node;
+					if (name === "svg") {
+						return;
+					}
+					const id = attributes.id;
+					if (id) {
+						const ref = "_SVG_ID_" + idMap.size;
+						idMap.set(id, ref);
+
+						delete attributes.id;
+						attributes[":id"] = ref;
+					}
+				},
+			},
+		}),
+	};
+}
+
+function dynamicUse(idMap: Map<string, string>): CustomPlugin {
+	return {
+		name: "dynamicUse",
+		fn: (_, __) => ({
+			element: {
+				enter(node) {
+					const attrs = node.attributes;
+					for (const [k, v] of Object.entries(attrs)) {
+						const match = /url\(#([^)]+)\)/i.exec(v);
+						if (match) {
+							const ref = idMap.get(match[1]);
+							if (ref) {
+								delete attrs[k];
+								attrs[":" + k] = "`url(#${" + ref + "})`";
+							}
+						}
+					}
+
+					const xhref = attrs["xlink:href"];
+					const href = attrs["href"];
+
+					if (href?.[0] === "#") {
+						const ref = idMap.get(href.slice(1));
+						if (ref) {
+							delete attrs.href;
+							attrs[":href"] = "'#'+" + ref;
+						}
+					}
+					if (xhref?.[0] === "#") {
+						const ref = idMap.get(xhref.slice(1));
+						if (ref) {
+							delete attrs["xlink:href"];
+							attrs[":xlink:href"] = "'#'+" + ref;
+						}
+					}
+				},
+			},
+		}),
+	};
+}
+
 /**
  * Remove all <style> elements and collect their content。
  *
@@ -170,6 +235,14 @@ export interface SVGSFCOptions {
 	 * @default {}
 	 */
 	svgo?: SVGOptions | false;
+
+	/**
+	 * Make `id` attributes inside the SVG component per-instance unique.
+	 * This feature requires Vue 3.5 `useId` function.
+	 *
+	 * @default false
+	 */
+	uniqueId?: boolean;
 }
 
 export class SVGSFCConvertor {
@@ -181,6 +254,7 @@ export class SVGSFCConvertor {
 	 * because SVGO runs synchronously, just empty the array before optimize.
 	 */
 	private readonly styles: string[] = [];
+	private readonly idMap = new Map<string, string>();
 
 	private readonly svgo?: SVGOptions | false;
 
@@ -229,8 +303,9 @@ export class SVGSFCConvertor {
 	}
 
 	private applyPresets(options: SVGSFCOptions) {
-		const { plugins, styles } = this;
+		const { plugins, styles, idMap } = this;
 		const {
+			uniqueId = false,
 			minify,
 			svgProps,
 			extractStyles = true,
@@ -245,6 +320,11 @@ export class SVGSFCConvertor {
 
 		if (responsive) {
 			plugins.push(responsiveSVGAttrs);
+		}
+
+		if (uniqueId) {
+			plugins.push(dynamicId(idMap));
+			plugins.push(dynamicUse(idMap));
 		}
 
 		if (minify) {
@@ -292,7 +372,8 @@ export class SVGSFCConvertor {
 	 * @param path The path of the SVG file, used by plugins.
 	 */
 	convert(svg: string, path?: string) {
-		const { styles, plugins, svgo } = this;
+		const { styles, idMap, plugins, svgo } = this;
+		idMap.clear();
 		styles.length = 0;
 
 		if (svgo) {
@@ -300,6 +381,15 @@ export class SVGSFCConvertor {
 		}
 
 		svg = `<template>${svg}</template>`;
+
+		if (idMap.size !== 0) {
+			svg += "<script setup>\nimport { useId } from 'vue';";
+			for (const ref of idMap.values()) {
+				svg += `\nconst ${ref} = useId()`;
+			}
+			svg += "\n</script>";
+		}
+
 		if (styles.length === 0) {
 			return svg;
 		} else {

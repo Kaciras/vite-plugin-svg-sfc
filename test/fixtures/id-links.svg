@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+	<symbol xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 16 16" id="aircraft">
+		<defs>
+			<path d="M0 0h24v24H0zm0 0h24v24H0zm0 0h24v24H0zm0 0h24v24H0z" id="aircraft_a"/>
+		</defs>
+		<g transform="translate(1 1)" fill-rule="evenodd">
+			<mask id="aircraft_b">
+				<use xlink:href="#aircraft_a"/>
+			</mask>
+			<use fill-rule="nonzero" xlink:href="#aircraft_a"/>
+			<g mask="url(#aircraft_b)">
+				<path d="M-27-27h68v68h-68z"/>
+			</g>
+		</g>
+	</symbol>
+	<use href="#aircraft"/>
+</svg>

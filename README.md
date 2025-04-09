@@ -174,6 +174,14 @@ Default: `undefined`
 
 Add props to the root SVG tag.
 
+### `uniqueId`
+
+Type: `boolean`
+
+Default: `false`
+
+Make `id` attributes inside the SVG component per-instance unique. This feature requires Vue 3.5 `useId` function.
+
 ### `svgo`
 
 Type: `OptimizeOptions | false`

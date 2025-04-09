@@ -32,6 +32,10 @@ it("should extract styles", () => {
 		.toContain("<style scoped>#rect { fill: blue; }.st0 { width: 100px; }</style>");
 });
 
+it("should convert ids", () => {
+	expect(convert("id-links.svg", { uniqueId: true })).toMatchSnapshot();
+});
+
 it("should not process SVG if svgo option is false", () => {
 	const code = convert("stroke.svg", { svgo: false });
 	expect(code).toBe(`<template>${strokeSVG}</template>`);
