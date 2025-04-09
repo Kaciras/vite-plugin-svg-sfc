@@ -70,23 +70,19 @@ export function modifySVGAttrs(params: SVGPropsParam): CustomPlugin {
 function dynamicId(idMap: Map<string, string>): CustomPlugin {
 	return {
 		name: "dynamicId",
-		fn: (_, __) => ({
-			element: {
-				enter(node) {
-					const { name, attributes } = node;
-					if (name === "svg") {
-						return;
-					}
-					const id = attributes.id;
-					if (id) {
-						const ref = "_SVG_ID_" + idMap.size;
-						idMap.set(id, ref);
+		fn: preItem(node => {
+			const { name, attributes } = node;
+			if (name === "svg") {
+				return;
+			}
+			const id = attributes.id;
+			if (id) {
+				const reference = "_SVG_ID_" + idMap.size;
+				idMap.set(id, reference);
 
-						delete attributes.id;
-						attributes[":id"] = ref;
-					}
-				},
-			},
+				delete attributes.id;
+				attributes[":id"] = reference;
+			}
 		}),
 	};
 }
@@ -94,40 +90,36 @@ function dynamicId(idMap: Map<string, string>): CustomPlugin {
 function dynamicUse(idMap: Map<string, string>): CustomPlugin {
 	return {
 		name: "dynamicUse",
-		fn: (_, __) => ({
-			element: {
-				enter(node) {
-					const attrs = node.attributes;
-					for (const [k, v] of Object.entries(attrs)) {
-						const match = /url\(#([^)]+)\)/i.exec(v);
-						if (match) {
-							const ref = idMap.get(match[1]);
-							if (ref) {
-								delete attrs[k];
-								attrs[":" + k] = "`url(#${" + ref + "})`";
-							}
-						}
-					}
+		fn: preItem(node => {
+			const { attributes } = node;
+			const xhref = attributes["xlink:href"];
+			const href = attributes["href"];
 
-					const xhref = attrs["xlink:href"];
-					const href = attrs["href"];
+			if (href?.charCodeAt(0) === 35 /* # */) {
+				const ref = idMap.get(href.slice(1));
+				if (ref) {
+					delete attributes.href;
+					attributes[":href"] = "'#'+" + ref;
+				}
+			}
+			if (xhref?.charCodeAt(0) === 35 /* # */) {
+				const ref = idMap.get(xhref.slice(1));
+				if (ref) {
+					delete attributes["xlink:href"];
+					attributes[":xlink:href"] = "'#'+" + ref;
+				}
+			}
 
-					if (href?.[0] === "#") {
-						const ref = idMap.get(href.slice(1));
-						if (ref) {
-							delete attrs.href;
-							attrs[":href"] = "'#'+" + ref;
-						}
+			for (const [k, v] of Object.entries(attributes)) {
+				const match = /url\(#([^)]+)\)/i.exec(v);
+				if (match) {
+					const ref = idMap.get(match[1]);
+					if (ref) {
+						delete attributes[k];
+						attributes[":" + k] = "`url(#${" + ref + "})`";
 					}
-					if (xhref?.[0] === "#") {
-						const ref = idMap.get(xhref.slice(1));
-						if (ref) {
-							delete attrs["xlink:href"];
-							attrs[":xlink:href"] = "'#'+" + ref;
-						}
-					}
-				},
-			},
+				}
+			}
 		}),
 	};
 }
@@ -237,8 +229,10 @@ export interface SVGSFCOptions {
 	svgo?: SVGOptions | false;
 
 	/**
-	 * Make `id` attributes inside the SVG component per-instance unique.
-	 * This feature requires Vue 3.5 `useId` function.
+	 * Make `id` attributes of elements in SVG component per-instance unique,
+	 * requires Vue 3.5 `useId` function.
+	 *
+	 * This feature is useful when you need link elements by id inside SVG.
 	 *
 	 * @default false
 	 */
@@ -250,8 +244,8 @@ export class SVGSFCConvertor {
 	private readonly plugins: PluginConfig[] = [];
 
 	/*
-	 * It's ok to use shared array between each module,
-	 * because SVGO runs synchronously, just empty the array before optimize.
+	 * It's ok to use shared state between each module,
+	 * because SVGO runs synchronously, just reset them before optimize.
 	 */
 	private readonly styles: string[] = [];
 	private readonly idMap = new Map<string, string>();
@@ -383,7 +377,9 @@ export class SVGSFCConvertor {
 		svg = `<template>${svg}</template>`;
 
 		if (idMap.size !== 0) {
-			svg += "<script setup>\nimport { useId } from 'vue';";
+			svg += "<script setup>\n" +
+				"import { useId } from 'vue';";
+
 			for (const ref of idMap.values()) {
 				svg += `\nconst ${ref} = useId()`;
 			}

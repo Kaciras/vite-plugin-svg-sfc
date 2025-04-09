@@ -180,7 +180,9 @@ Type: `boolean`
 
 Default: `false`
 
-Make `id` attributes inside the SVG component per-instance unique. This feature requires Vue 3.5 `useId` function.
+Make `id` attributes of elements in SVG component per-instance unique, requires Vue 3.5 `useId` function.
+
+This feature is useful when you need link elements by id inside SVG.
 
 ### `svgo`
 
