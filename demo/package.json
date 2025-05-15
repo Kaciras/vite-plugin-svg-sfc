@@ -7,13 +7,13 @@
 		"build": "vite build"
 	},
 	"dependencies": {
-		"bootstrap-icons": "^1.12.1",
+		"bootstrap-icons": "^1.13.1",
 		"prismjs": "^1.30.0",
-		"vue": "^3.5.13"
+		"vue": "^3.5.14"
 	},
 	"devDependencies": {
 		"@types/prismjs": "^1.26.5",
-		"@vitejs/plugin-vue": "^5.2.3",
+		"@vitejs/plugin-vue": "^5.2.4",
 		"vite": "^6.3.5"
 	}
 }
