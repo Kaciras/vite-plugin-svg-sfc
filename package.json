@@ -33,20 +33,20 @@
 		"test": "vitest run"
 	},
 	"dependencies": {
-		"svgo": "^3.3.2"
+		"svgo": "^4.0.0"
 	},
 	"devDependencies": {
 		"@kaciras/eslint-config-core": "^3.3.0",
 		"@kaciras/eslint-config-typescript": "^3.3.0",
 		"@kaciras/eslint-config-vue": "^3.3.0",
-		"@types/node": "^24.0.1",
+		"@types/node": "^24.0.3",
 		"@vitejs/plugin-vue": "^5.2.4",
-		"@vitest/coverage-v8": "^3.2.3",
+		"@vitest/coverage-v8": "^3.2.4",
 		"eslint": "^9.29.0",
-		"rollup": "^4.43.0",
+		"rollup": "^4.44.0",
 		"typescript": "^5.8.3",
 		"vite": "^6.3.5",
-		"vitest": "^3.2.3",
-		"vue": "^3.5.16"
+		"vitest": "^3.2.4",
+		"vue": "^3.5.17"
 	}
 }
