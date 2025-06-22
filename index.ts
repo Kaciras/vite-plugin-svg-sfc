@@ -309,7 +309,6 @@ export class SVGSFCConvertor {
 		const overrides: Record<string, boolean> = {
 			// Don't remove IDs, it may be referenced from outside.
 			cleanupIds: false,
-			removeViewBox: false,
 		};
 
 		if (responsive) {
@@ -322,6 +321,7 @@ export class SVGSFCConvertor {
 		}
 
 		if (minify) {
+			plugins.push("removeTitle");
 			plugins.push({
 				name: "preset-default",
 				params: { overrides },
