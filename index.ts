@@ -1,7 +1,6 @@
 import { readFileSync } from "fs";
-import { Plugin as PluginFn, PluginInfo, XastElement } from "svgo/lib/types";
+import { Config, CustomPlugin, optimize, Plugin as PluginFn, PluginConfig, PluginInfo, XastElement } from "svgo";
 import { Plugin as VitePlugin } from "vite";
-import { Config, CustomPlugin, optimize, PluginConfig } from "svgo";
 
 /**
  * Called on each svg root element, modify the attrs in place.
@@ -159,7 +158,7 @@ type PluginConfigEx = { name: "extractCSS" }
 	| { name: "responsiveSVGAttrs" }
 	| { name: "modifySVGAttrs"; params?: SVGPropsParam };
 
-type PluginEx = PluginConfig | PluginConfigEx | PluginConfigEx["name"]
+type PluginEx = PluginConfig | PluginConfigEx | PluginConfigEx["name"];
 
 export interface SVGOptions extends Omit<Config, "plugins"> {
 	plugins?: PluginEx[];
@@ -377,8 +376,7 @@ export class SVGSFCConvertor {
 		svg = `<template>${svg}</template>`;
 
 		if (idMap.size !== 0) {
-			svg += "<script setup>\n" +
-				"import { useId } from 'vue';";
+			svg += "<script setup>\nimport { useId } from 'vue';";
 
 			for (const ref of idMap.values()) {
 				svg += `\nconst ${ref} = useId()`;
