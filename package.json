@@ -41,12 +41,12 @@
 		"@kaciras/eslint-config-vue": "^3.4.1",
 		"@types/node": "^24.10.1",
 		"@vitejs/plugin-vue": "^6.0.2",
-		"@vitest/coverage-v8": "^4.0.13",
+		"@vitest/coverage-v8": "^4.0.15",
 		"eslint": "^9.39.1",
 		"rollup": "^4.53.3",
 		"typescript": "^5.9.3",
-		"vite": "^7.2.4",
-		"vitest": "^4.0.13",
+		"vite": "^7.2.6",
+		"vitest": "^4.0.15",
 		"vue": "^3.5.25"
 	}
 }
