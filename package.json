@@ -39,14 +39,14 @@
 		"@kaciras/eslint-config-core": "^3.4.1",
 		"@kaciras/eslint-config-typescript": "^3.4.1",
 		"@kaciras/eslint-config-vue": "^3.4.1",
-		"@types/node": "^24.10.2",
-		"@vitejs/plugin-vue": "^6.0.2",
-		"@vitest/coverage-v8": "^4.0.15",
-		"eslint": "^9.39.1",
-		"rollup": "^4.53.3",
+		"@types/node": "^25.0.3",
+		"@vitejs/plugin-vue": "^6.0.3",
+		"@vitest/coverage-v8": "^4.0.16",
+		"eslint": "^9.39.2",
+		"rollup": "^4.53.5",
 		"typescript": "^5.9.3",
-		"vite": "^7.2.7",
-		"vitest": "^4.0.15",
+		"vite": "^7.3.0",
+		"vitest": "^4.0.16",
 		"vue": "^3.5.25"
 	}
 }
