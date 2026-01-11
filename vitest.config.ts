@@ -1,11 +1,10 @@
-import { defineConfig } from "vite";
+import { defineConfig } from "vitest/config";
 
 export default defineConfig({
 	test: {
 		restoreMocks: true,
 		coverage: {
 			provider: "v8",
-			all: false,
 			reporter: ["lcovonly"],
 		},
 		include: ["test/*-test.ts"],
