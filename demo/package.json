@@ -14,6 +14,6 @@
 	"devDependencies": {
 		"@types/prismjs": "^1.26.6",
 		"@vitejs/plugin-vue": "^6.0.7",
-		"vite": "^8.0.14"
+		"vite": "^8.0.16"
 	}
 }
