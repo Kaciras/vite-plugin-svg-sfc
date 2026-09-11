@@ -1,6 +1,7 @@
 import { readFileSync } from "fs";
 import { Config, CustomPlugin, optimize, Plugin as PluginFn, PluginConfig, PluginInfo, XastElement } from "svgo";
 import { Plugin as VitePlugin } from "vite";
+import { Plugin as RollupPlugin } from "rollup";
 
 /**
  * Called on each svg root element, modify the attrs in place.
@@ -419,7 +420,7 @@ function parseRequest(id: string): [string, URLSearchParams, string] {
 /**
  * Convert SVG to Vue SFC, you need another plugin to process the .vue file。
  */
-export default function (options: SVGSFCPluginOptions = {}): VitePlugin {
+export default function (options: SVGSFCPluginOptions = {}): VitePlugin & RollupPlugin {
 	const { mark = "sfc" } = options;
 	let svg2sfc: SVGSFCConvertor;
 
@@ -486,7 +487,7 @@ export default function (options: SVGSFCPluginOptions = {}): VitePlugin {
 				id = path.slice(0, -4);
 			}
 
-			const r = await this.resolve(id, importer);
+			const r = await (this as any).resolve(id, importer);
 			if (!r) {
 				throw new Error("Cannot resolve file: " + id);
 			}

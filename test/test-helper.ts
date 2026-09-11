@@ -1,12 +1,11 @@
 import { basename, join } from "path";
 import { copyFileSync, mkdirSync, mkdtempSync, rmSync } from "fs";
 import { tmpdir } from "os";
-import { RollupOutput } from "rollup";
-import { build, HotPayload, Plugin, ViteDevServer } from "vite";
+import { build, HotPayload, Rolldown, ViteDevServer } from "vite";
 import { afterEach, beforeEach, expect } from "vitest";
 import svgSfc, { SVGSFCPluginOptions } from "../index.ts";
 
-export const extractSFCPlugin: Plugin = {
+export const extractSFCPlugin: any = {
 	name: "test:extract-sfc",
 	transform(source: string, id: string) {
 		const [path] = id.split("?", 2);
@@ -30,7 +29,7 @@ export interface TestOptions {
 export function compile(fixture: string, options: TestOptions = {}) {
 	const { mode, config } = options;
 
-	return <Promise<RollupOutput>>build({
+	return <Promise<Rolldown.RolldownOutput>>build({
 		logLevel: "silent",
 		mode,
 		build: {
@@ -58,7 +57,7 @@ export function compile(fixture: string, options: TestOptions = {}) {
  * @param bundle Rollup output.
  * @param name The file name, query string is ignored.
  */
-export function getAsset(bundle: RollupOutput, name: string) {
+export function getAsset(bundle: Rolldown.RolldownOutput, name: string) {
 	[name] = name.split("?", 2);
 	const file = bundle.output.find(a => a.fileName === name);
 

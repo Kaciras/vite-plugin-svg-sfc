@@ -2,8 +2,7 @@ import { cwd } from "process";
 import { join, resolve } from "path";
 import { writeFileSync } from "fs";
 import { expect, it } from "vitest";
-import { build, createServer, UpdatePayload } from "vite";
-import { RollupOutput } from "rollup";
+import { build, createServer, Rolldown, UpdatePayload } from "vite";
 import vue from "@vitejs/plugin-vue";
 import { createApp } from "vue";
 import { renderToString } from "vue/server-renderer";
@@ -19,7 +18,7 @@ async function loadBundle<T = any>(code: string) {
 }
 
 it("should throw on non-SVG data", () => {
-	return expect(convert("png-data.svg?sfc")).rejects.toThrow(/Could not load/);
+	return expect(convert("png-data.svg?sfc")).rejects.toThrow("Non-whitespace before first tag");
 });
 
 it("should throw on non-exists file", () => {
@@ -60,7 +59,7 @@ it("should work with @vitejs/plugin-vue", async () => {
 		},
 		plugins: [vue(), svgSfc()],
 	});
-	const { code } = (bundle as RollupOutput).output[0];
+	const { code } = (bundle as Rolldown.RolldownOutput).output[0];
 
 	const component = await loadBundle(code);
 	const app = createApp(component, { width: 4396 });
